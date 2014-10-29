@@ -30,6 +30,20 @@
       <url>http://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
+  
+  <scm>
+    <connection>scm:git:ssh://github.com/vipinsthename/environment-dashboard.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/vipinsthename/environment-dashboard.git</developerConnection>
+    <url>https://github.com/vipinsthename/environment-dashboard</url>
+  </scm>
+  
+  <developers>
+    <developer>
+      <id>vipinsthename</id>
+      <name>Vipin</name>
+      <email>vipinsthename@gmail.com</email>
+    </developer>
+  </developers>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
   <repositories>
