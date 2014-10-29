@@ -32,9 +32,10 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:ssh://github.com/vipinsthename/environment-dashboard.git</connection>
+    <connection>scm:git:https://github.com/vipinsthename/environment-dashboard.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/vipinsthename/environment-dashboard.git</developerConnection>
     <url>https://github.com/vipinsthename/environment-dashboard</url>
+	<tag>HEAD</tag>
   </scm>
   
   <developers>
