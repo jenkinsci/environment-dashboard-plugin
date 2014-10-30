@@ -203,11 +203,11 @@ public class EnvDashboardView extends View {
                 String finalUrl = getCurrentUrl(finalEnvComp);
                 String finalNumber = getCurrentNum(finalEnvComp);
                 if (finalStatus.equals("SUCCESS")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#d9edf7; color: #31708f\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-ok\" style=\"font-size:20px;\"></i></div></a></div></td>";
+                    finalHTML = finalHTML + "<td style=\"background-color:#00bc8c; color: #bc0030\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-ok\" style=\"font-size:20px;\"></i></div></a></div></td>";
                 } else if (finalStatus.equals("RUNNING")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#dff0d8; color: #3c763d\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-play\" style=\"font-size:20px;\"></i></div></a></div></td>";
+                    finalHTML = finalHTML + "<td style=\"background-color:#3498db; color: #db7734\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-play\" style=\"font-size:20px;\"></i></div></a></div></td>";
                 } else if (finalStatus.equals("FAILURE")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#f2dede; color: #a94442\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-remove\" style=\"font-size:20px;\"></i></div></a></div></td>";
+                    finalHTML = finalHTML + "<td style=\"background-color:#e74c3c; color: #3cd7e7\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-remove\" style=\"font-size:20px;\"></i></div></a></div></td>";
                 } else {
                     finalHTML = finalHTML + "<td style=\"background-color:#332C2F; color: #FFFFFF\"><div><div align=\"center\" style=\"font-size:15px;\">No deploys</div></div></td>";
                 }
