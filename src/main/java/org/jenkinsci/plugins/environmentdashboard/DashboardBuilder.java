@@ -98,7 +98,7 @@ public class DashboardBuilder extends BuildWrapper {
         try {
             stat = conn.createStatement();
         } catch (SQLException e) {
-            listener.getLogger().println("WARN: Could not execute statement.");
+            returnComment = "WARN: Could not execute statement.";
             return returnComment;
         }
         try {
@@ -117,7 +117,12 @@ public class DashboardBuilder extends BuildWrapper {
             currentBuildResult = build.getResult().toString();
         }
         String currentBuildUrl = build.getUrl();
-        Integer currentBuild = Integer.parseInt(bNumber);
+		Integer currentBuild;
+		try { 
+			currentBuild = Integer.parseInt(bNumber); 
+		} catch(NumberFormatException e) { 
+			return "The build number provided is not an integer."; 
+		}
         String runQuery = null;
         if (runTime.equals("PRE")) {
             runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', " + currentBuild + ", '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp);";

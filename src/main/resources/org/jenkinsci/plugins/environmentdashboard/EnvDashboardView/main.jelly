@@ -1,6 +1,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
     <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
     <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
+    <link href="${rootURL}/plugin/environment-dashboard/css/blink.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript">
         setInterval(function(){
         var plugin = <st:bind value="${from}"/>;
@@ -18,7 +19,7 @@
             <tbody>
                 <j:switch on="${it.anyJobsConfigured()}">
                     <j:case value="NONE">
-                        <tr><div class="jumbotron"><h1>Hi, there!</h1><p>You possible haven't set up any jobs to use the Dashboard. Configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p></div></tr>
+                        <tr><div class="jumbotron"><h2>Hi, there!</h2><p>You possibly haven't set up any jobs to use the Dashboard. Or if you have, the job hasn't run atleast once. You can configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p></div></tr>
                     </j:case>
                     <j:case value="ENVS">
                         <tr>
@@ -40,7 +41,7 @@
                                             <td style="background-color:#e74c3c; color: #3cd7e7"><div><a href="${it.getCurrentUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-remove" style="font-size:20px;"></i></div></a></div></td>
                                         </j:case>
                                         <j:case value="RUNNING">
-                                            <td style="background-color:#3498db; color: #db7734"><div><a href="${it.getCurrentUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-play" style="font-size:20px;"></i></div></a></div></td>
+                                            <td class="deploying" style="background-color:#3498db; color: #db7734"><div><a href="${it.getCurrentUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-play" style="font-size:20px;"></i></div></a></div></td>
                                         </j:case>
                                         <j:default>
                                             <td style="background-color:#332C2F; color: #FFFFFF"><div><div align="center" style="font-size:15px;">No deploys</div></div></td>

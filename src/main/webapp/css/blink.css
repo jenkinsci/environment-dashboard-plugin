@@ -1,0 +1,22 @@
+@-webkit-keyframes deploying {
+  from { background-color: #3498db; }
+  to { background-color: inherit; }
+}
+@-moz-keyframes deploying {
+  from { background-color: #3498db; }
+  to { background-color: inherit; }
+}
+@-o-keyframes deploying {
+  from { background-color: #3498db; }
+  to { background-color: inherit; }
+}
+@keyframes deploying {
+  from { background-color: #3498db; }
+  to { background-color: inherit; }
+}
+.deploying {
+  -webkit-animation: deploying 2s infinite; /* Safari 4+ */
+  -moz-animation:    deploying 2s infinite; /* Fx 5+ */
+  -o-animation:      deploying 2s infinite; /* Opera 12+ */
+  animation:         deploying 2s infinite; /* IE 10+ */
+}
