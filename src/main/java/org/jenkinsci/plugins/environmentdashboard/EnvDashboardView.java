@@ -24,12 +24,16 @@ public class EnvDashboardView extends View {
     private String compOrder = null;
 
     private int refreshInterval = 10;
+    
+    private boolean showHeader = false;
+
 
     @DataBoundConstructor
-    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final int refreshInterval) {
+    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final int refreshInterval, final boolean showHeader) {
         super(name, Hudson.getInstance());
         this.envOrder = envOrder;
         this.compOrder = compOrder;
+        this.showHeader = showHeader;
         if (refreshInterval < 10) {
             this.refreshInterval = 10;
         } else {
@@ -312,6 +316,14 @@ public class EnvDashboardView extends View {
 
     public void setRefreshInterval(final int refreshInterval) {
         this.refreshInterval = refreshInterval;
+    }
+
+    public boolean getShowHeader() {
+        return showHeader;
+    }
+
+    public void setShowHeader(final boolean showHeader) {
+        this.showHeader = showHeader;
     }
 
     public int getRefreshFrequencyInMillis() {
