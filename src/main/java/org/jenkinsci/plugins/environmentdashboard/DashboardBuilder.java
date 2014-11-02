@@ -23,12 +23,14 @@ public class DashboardBuilder extends BuildWrapper {
     private final String nameOfEnv;
     private final String componentName;
     private final String buildNumber;
+    private final String buildJob;
 
     @DataBoundConstructor
-    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber) {
+    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob) {
         this.nameOfEnv = nameOfEnv;
         this.componentName = componentName;
         this.buildNumber = buildNumber;
+        this.buildJob = buildJob;
     }
 
     public String getNameOfEnv() {
@@ -40,6 +42,9 @@ public class DashboardBuilder extends BuildWrapper {
     public String getBuildNumber() {
         return buildNumber;
     }
+    public String getBuildJob() {
+        return buildJob;
+    }
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -49,9 +54,10 @@ public class DashboardBuilder extends BuildWrapper {
         String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
         String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
         String passedCompName = build.getEnvironment(listener).expand(componentName);
+        String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
         String returnComment = null;
         if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
-            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE");
+            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob);
             listener.getLogger().println("Pre-Build Update: " + returnComment);
         }
         // TearDown - This runs post all build steps
@@ -61,9 +67,10 @@ public class DashboardBuilder extends BuildWrapper {
                 String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
                 String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
                 String passedCompName = build.getEnvironment(listener).expand(componentName);
+                String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
                 String returnComment = null;
                 if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
-                    returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST");
+                    returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST", passedBuildJob);
                     listener.getLogger().println("Post-Build Update: " + returnComment);
                 }
                 return super.tearDown(build, listener);
@@ -73,7 +80,7 @@ public class DashboardBuilder extends BuildWrapper {
     }
 
     @SuppressWarnings("rawtypes")
-    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String bNumber, String runTime) {
+    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String bNumber, String runTime, String buildJob) {
         String returnComment = null;
         if (envName.matches("^\\s*$") || compName.matches("^\\s*$")) {
             returnComment = "WARN: Either Environment name or Component name is empty.";
@@ -102,7 +109,7 @@ public class DashboardBuilder extends BuildWrapper {
             return returnComment;
         }
         try {
-            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum INTEGER, buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP );");
+            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum INTEGER, buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP,  buildJobUrl VARCHAR(255));");
         } catch (SQLException e) {
             returnComment = "WARN: Could not create table env_dashboard.";
             return returnComment;
@@ -117,6 +124,14 @@ public class DashboardBuilder extends BuildWrapper {
             currentBuildResult = build.getResult().toString();
         }
         String currentBuildUrl = build.getUrl();
+
+        String buildJobUrl;
+        if (buildJob.isEmpty()) {
+            buildJobUrl = "";
+        } else {
+            buildJobUrl = "job/" + buildJob + "/" + bNumber;
+        }
+
 		Integer currentBuild;
 		try { 
 			currentBuild = Integer.parseInt(bNumber); 
@@ -125,7 +140,7 @@ public class DashboardBuilder extends BuildWrapper {
 		}
         String runQuery = null;
         if (runTime.equals("PRE")) {
-            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', " + currentBuild + ", '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp);";
+            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', " + currentBuild + ", '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "');";
         } else {
             if (runTime.equals("POST")) {
                 runQuery = "UPDATE env_dashboard SET buildStatus = '" + currentBuildResult + "', created_at = current_timestamp WHERE envComp = '" + indexValueofTable +"' AND buildNum = " + currentBuild;
@@ -158,6 +173,7 @@ public class DashboardBuilder extends BuildWrapper {
         private String nameOfEnv;
         private String componentName;
         private String buildNumber;
+        private String buildJob;
 
         public DescriptorImpl() {
             load();
@@ -198,6 +214,7 @@ public class DashboardBuilder extends BuildWrapper {
             nameOfEnv = formData.getString("nameOfEnv");
             componentName = formData.getString("componentName");
             buildNumber = formData.getString("buildNumber");
+            buildJob = formData.getString("buildJob");
             save();
             return super.configure(req,formData);
         }
