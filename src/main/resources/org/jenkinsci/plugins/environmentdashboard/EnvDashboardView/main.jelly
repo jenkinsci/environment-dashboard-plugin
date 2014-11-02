@@ -15,7 +15,7 @@
         },${it.getRefreshFrequencyInMillis()});
     </script>
     <div id="startDashboard">
-        <table id="envDashboard" class="table table-bordered">
+        <table id="envDashboard" class="table table-bordered table-striped table-condensed">
             <tbody>
                 <j:switch on="${it.anyJobsConfigured()}">
                     <j:case value="NONE">
