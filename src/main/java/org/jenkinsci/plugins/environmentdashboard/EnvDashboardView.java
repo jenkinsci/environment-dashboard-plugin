@@ -167,61 +167,6 @@ public class EnvDashboardView extends View {
         return orderOfEnvs;
     }
 
-    @JavaScriptMethod
-    public String writeHTML() {
-
-        ArrayList<String> newOrderOfEnvs;
-        ArrayList<String> newOrderOfComps;
-
-        newOrderOfEnvs = getOrderOfEnvs();
-
-        String finalHTML;
-
-        if (newOrderOfEnvs == null || newOrderOfEnvs.isEmpty()) {
-            finalHTML = "<table id=\"envDashboard\"><tr><div class=\"jumbotron\"><h1>Hi, there!</h1><p>You possible haven't set up any jobs to use the Dashboard. Configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p></div></tr></table>";
-            return finalHTML;
-        }
-
-        newOrderOfComps = getOrderOfComps();
-
-        finalHTML = "        <table id=\"envDashboard\" class=\"table table-bordered\"><tbody>" +
-                "            <tr>" +
-                "            <td></td>";
-        for (String head : newOrderOfEnvs) {
-            if (!(head == null || head.matches("^\\s*$"))) {
-                finalHTML = finalHTML + "<th><div align=\"center\">" + head + "</div></th>";
-            }
-        }
-        finalHTML = finalHTML + "</tr>";
-        for (String comps : newOrderOfComps) {
-            if (comps == null || comps.matches("^\\s*$")) {
-                continue;
-            }
-            finalHTML = finalHTML + "<tr><td><div align=\"center\"><strong>" + comps + "</strong></div></td>";
-            for (String envs : newOrderOfEnvs) {
-                if (envs == null || envs.matches("^\\s*$")) {
-                    continue;
-                }
-                String finalEnvComp = envs + "=" + comps;
-                String finalStatus = getCurrentStatus(finalEnvComp);
-                String finalUrl = getCurrentUrl(finalEnvComp);
-                String finalNumber = getCurrentNum(finalEnvComp);
-                if (finalStatus.equals("SUCCESS")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#00bc8c; color: #bc0030\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-ok\" style=\"font-size:20px;\"></i></div></a></div></td>";
-                } else if (finalStatus.equals("RUNNING")) {
-                    finalHTML = finalHTML + "<td class=\"deploying\" style=\"background-color:#3498db; color: #db7734\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-play\" style=\"font-size:20px;\"></i></div></a></div></td>";
-                } else if (finalStatus.equals("FAILURE")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#e74c3c; color: #3cd7e7\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-remove\" style=\"font-size:20px;\"></i></div></a></div></td>";
-                } else {
-                    finalHTML = finalHTML + "<td style=\"background-color:#332C2F; color: #FFFFFF\"><div><div align=\"center\" style=\"font-size:15px;\">No deploys</div></div></td>";
-                }
-            }
-            finalHTML = finalHTML + "</tr>";
-        }
-        finalHTML = finalHTML + "</tbody></table>";
-        return finalHTML;
-    }
-
     public ArrayList<String> getOrderOfComps() {
         ArrayList<String> orderOfComps;
         orderOfComps = splitCompOrder(compOrder);
@@ -258,54 +203,38 @@ public class EnvDashboardView extends View {
     }
 
     public String getCurrentStatus(String envCompArg){
-        String envCompBuildStatus = "UNKNOWN";
-        String queryString = "SELECT ed.buildstatus AS status FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
+         return getField(envCompArg, "buildstatus");
+    }
+
+    public String getCurrentUrl(String envCompArg){
+        return getField(envCompArg, "joburl");
+    }
+
+    public String getCurrentNum(String envCompArg){
+        return getField(envCompArg, "buildnum");
+    }
+
+    public String getCurrentTimestamp(String envCompArg){
+        return getField(envCompArg, "created_at").substring(0,19);
+    }
+
+    public String getField(String envCompArg, String column) {
+        String envField = "UNKNOWN";
+        String queryString = "SELECT ed." + column + " FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
         try {
             ResultSet rs = runQuery(queryString);
             while (rs.next()) {
-                envCompBuildStatus = rs.getString("status");
+                envField = rs.getString(column);
             }
             closeDBConnection();
         } catch (SQLException e) {
             System.out.println("E9");
-            return "Error executing build status query!";
+            return "Error executing build " + column + " query!";
         }
-        return envCompBuildStatus;
+        return envField;
     }
 
-    public String getCurrentUrl(String envCompArg){
-        String envCompBuildUrl = "UNKNOWN";
-        String queryString = "SELECT ed.joburl AS url FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
-        try {
-            ResultSet rs = runQuery(queryString);
-            while (rs.next()) {
-                envCompBuildUrl = rs.getString("url");
-            }
-            closeDBConnection();
-        } catch (SQLException e) {
-            System.out.println("E10");
-            return "Error executing build url query!";
-        }
-        return envCompBuildUrl;
-    }
-
-    public String getCurrentNum(String envCompArg){
-        String envCompBuildNumber = "UNKNOWN";
-        String queryString = "SELECT ed.buildnum AS number FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
-        try {
-            ResultSet rs = runQuery(queryString);
-            while (rs.next()) {
-                envCompBuildNumber = rs.getString("number");
-            }
-            closeDBConnection();
-        } catch (SQLException e) {
-            System.out.println("E11");
-            return "Error executing build number query!";
-        }
-        return envCompBuildNumber;
-    }
-
-    @Override
+        @Override
     public Collection<TopLevelItem> getItems() {
         return null;
     }
