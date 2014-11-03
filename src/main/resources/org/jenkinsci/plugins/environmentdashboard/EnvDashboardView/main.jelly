@@ -35,22 +35,22 @@
                                     <j:set var="envComp" value="${it.getenvComps(envs, comps)}" />
                                     <j:switch on="${it.getCurrentStatus(envComp)}">
                                         <j:case value="SUCCESS">
-                                            <td style="background-color:#00bc8c; color: #bc0030"><div><a title="View Build" href="${it.getBuildUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-ok" style="font-size:20px;"></i></div></a></div>
-                                            <code><a title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a></code>
+                                            <td style="background-color:#33C633; color: #0000FF"><div><a title="View Build" href="${it.getBuildUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:large;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-ok" style="font-size:20px;"></i></div></a></div>
+                                            <div align="right"><code><a title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a></code></div>
                                             </td>
                                         </j:case>
                                         <j:case value="FAILURE">
-                                            <td style="background-color:#e74c3c; color: #3cd7e7"><div><a title="View Build" href="${it.getBuildUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-remove" style="font-size:20px;"></i></div></a></div>
-                                            <code><a title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a></code>
+                                            <td style="background-color:#e74c3c; color: #3cd7e7"><div><a title="View Build" href="${it.getBuildUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:large;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-remove" style="font-size:20px;"></i></div></a></div>
+                                            <div align="right"><code><a title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a></code></div>
                                             </td>
                                         </j:case>
                                         <j:case value="RUNNING">
-                                            <td class="deploying" style="background-color:#3498db; color: #db7734"><div><a title="View Build" href="${it.getBuildUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-play" style="font-size:20px;"></i></div></a></div>
-                                            <code>STARTED: <a title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a></code>
+                                            <td class="deploying" style="background-color:#3498db; color: #db7734"><div><a title="View Build" href="${it.getBuildUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:large;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-play" style="font-size:20px;"></i></div></a></div>
+                                            <div align="right"><code>STARTED: <a title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a></code></div>
                                             </td>
                                         </j:case>
                                         <j:default>
-                                            <td style="background-color:#332C2F; color: #FFFFFF"><div><div align="center" style="font-size:15px;">-</div></div></td>
+                                            <td><div align="center" style="font-size:15px;">-</div></td>
                                         </j:default>
                                     </j:switch>
                                 </j:forEach>
