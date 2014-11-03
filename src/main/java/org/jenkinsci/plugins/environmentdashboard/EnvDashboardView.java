@@ -232,7 +232,7 @@ public class EnvDashboardView extends View {
 
     public String getField(String envCompArg, String column) {
         String envField = "UNKNOWN";
-        String queryString = "SELECT ed." + column + " FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
+        String queryString = "select top 1 " + column + " from env_dashboard where envcomp = '" + envCompArg + "' order by created_at desc";
         try {
             ResultSet rs = runQuery(queryString);
             while (rs.next()) {
