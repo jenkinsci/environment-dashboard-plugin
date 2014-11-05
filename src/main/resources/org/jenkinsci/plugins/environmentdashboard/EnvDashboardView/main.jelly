@@ -2,18 +2,6 @@
     <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
     <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
     <link href="${rootURL}/plugin/environment-dashboard/css/blink.css" type="text/css" rel="stylesheet" />
-    <script type="text/javascript">
-        setInterval(function(){
-        var plugin = <st:bind value="${from}"/>;
-        plugin.writeHTML(function(t){
-        var Obj = document.getElementById('envDashboard');
-        Obj.parentNode.removeChild(Obj);
-        var str = t.responseObject();
-        var startDashboard = document.getElementById('startDashboard');
-        startDashboard.innerHTML = str;
-        })
-        },${it.getRefreshFrequencyInMillis()});
-    </script>
     <div id="startDashboard">
         <table id="envDashboard" class="table table-bordered table-striped table-condensed">
             <tbody>
