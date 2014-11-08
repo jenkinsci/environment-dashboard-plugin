@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.File;
 import java.io.IOException;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import java.sql.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -110,13 +111,13 @@ public class EnvDashboardView extends View {
         try {
             conn = DriverManager.getConnection("jdbc:h2:" + jenkinsDashboardDb);
         } catch (SQLException e) {
-            System.out.println("E2");
+            System.out.println("E2" + e.getMessage());
         }
         try {
             assert conn != null;
             stat = conn.createStatement();
         } catch (SQLException e) {
-            System.out.println("E3");
+            System.out.println("E3" + e.getMessage());
         }
         try {
             assert stat != null;
@@ -174,12 +175,32 @@ public class EnvDashboardView extends View {
                 }
                 closeDBConnection();
             } catch (SQLException e) {
-                System.out.println("E8");
+                System.out.println("E8" + e.getMessage());
                 return null;
             }
         }
         return orderOfComps;
     }
+
+    public ArrayList<String> getDeployments(String env) {
+        ArrayList<String> deployments;
+        deployments = new ArrayList<String>();
+        String queryString="select created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
+            try {
+                ResultSet rs = runQuery(queryString);
+                while (rs.next()) {
+                    deployments.add(rs.getString("created_at"));
+                }
+                closeDBConnection();
+            } catch (SQLException e) {
+                System.out.println("E11" + e.getMessage());
+                return null;
+            }
+        return deployments;
+
+    }
+
+
 
     public String getenvComps(String env, String comp) {
         return env + "=" + comp;
@@ -208,7 +229,11 @@ public class EnvDashboardView extends View {
     }
 
     public String getCurrentTimestamp(String envCompArg){
-        return getField(envCompArg, "created_at").substring(0,19);
+        return getNiceTimeStamp(getField(envCompArg, "created_at"));
+    }
+
+    public String getNiceTimeStamp(String timeStamp) {
+        return timeStamp.substring(0,19);
     }
 
     public String getBuildUrl(String envCompArg){
@@ -224,20 +249,57 @@ public class EnvDashboardView extends View {
 
 
     public String getField(String envCompArg, String column) {
-        String envField = "UNKNOWN";
+        String field = "UNKNOWN";
         String queryString = "select top 1 " + column + " from env_dashboard where envcomp = '" + envCompArg + "' order by created_at desc";
         try {
             ResultSet rs = runQuery(queryString);
             while (rs.next()) {
-                envField = rs.getString(column);
+                field = rs.getString(column);
             }
             closeDBConnection();
         } catch (SQLException e) {
-            System.out.println("E9");
-            return "Error executing build " + column + " query!";
+            System.out.println("E9" + e.getMessage());
+            return "Error executing: " + queryString;
         }
-        return envField;
+        return field;
     }
+
+    public HashMap getCompDeployed(String env, String time) {
+        HashMap<String, String> deployment;
+        deployment = new HashMap<String, String>();
+        String[] fields = {"buildstatus", "compName", "buildJobUrl", "jobUrl", "buildNum"};
+        String queryString = "select " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and created_at = '" + time + "';";
+        try {
+            ResultSet rs = runQuery(queryString);
+            rs.next();
+            for (String field : fields) {
+                deployment.put(field, rs.getString(field));
+            }
+            closeDBConnection();
+        } catch (SQLException e) {
+            System.out.println("E10" + e.getMessage());
+            System.out.println("Error executing: " + queryString);
+        }
+        return deployment;
+    }
+
+    public String getStatusChar(String statusWord) {
+
+        String statusChar;
+
+        if ("SUCCESS".equals(statusWord)) {
+            statusChar = "<span title=\"" + statusWord  + "\" style=\"color:green;\">&#10004;</font>";
+        } else if ("FAILURE".equals(statusWord)) {
+            statusChar = "<span title=\"\" + statusWord  + \"\" style=\"color:darkred;\">&#x2716;</font>";
+        } else if ("RUNNING".equals(statusWord)) {
+            statusChar = "<span title=\"\" + statusWord  + \"\" style=\"color:blue;\">&#9658;</font>";
+        } else {
+            statusChar = "?";
+        }
+
+        return statusChar;
+    }
+
 
         @Override
     public Collection<TopLevelItem> getItems() {

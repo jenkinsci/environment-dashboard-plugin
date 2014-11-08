@@ -126,6 +126,7 @@ public class DashboardBuilder extends BuildWrapper {
         String currentBuildUrl = build.getUrl();
 
         String buildJobUrl;
+        //Build job is an optional configuration setting
         if (buildJob.isEmpty()) {
             buildJobUrl = "";
         } else {
