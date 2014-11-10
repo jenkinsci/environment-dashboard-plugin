@@ -102,6 +102,7 @@ public class EnvDashboardView extends View {
     String jenkinsDashboardDb = (jenkinsHome + File.separator + "jenkins_dashboard");
 
     public ResultSet runQuery(String queryString) {
+
         ResultSet rs = null;
         try {
             Class.forName("org.h2.Driver");
@@ -200,8 +201,6 @@ public class EnvDashboardView extends View {
 
     }
 
-
-
     public String getenvComps(String env, String comp) {
         return env + "=" + comp;
     }
@@ -216,52 +215,8 @@ public class EnvDashboardView extends View {
         }
     }
 
-    public String getCurrentStatus(String envCompArg){
-         return getField(envCompArg, "buildstatus");
-    }
-
-    public String getCurrentUrl(String envCompArg){
-        return getField(envCompArg, "joburl");
-    }
-
-    public String getCurrentNum(String envCompArg){
-        return getField(envCompArg, "buildnum");
-    }
-
-    public String getCurrentTimestamp(String envCompArg){
-        return getNiceTimeStamp(getField(envCompArg, "created_at"));
-    }
-
     public String getNiceTimeStamp(String timeStamp) {
         return timeStamp.substring(0,19);
-    }
-
-    public String getBuildUrl(String envCompArg){
-        String buildJobUrl = getField(envCompArg, "buildJobUrl");
-
-        if (buildJobUrl.isEmpty()) {
-            return getCurrentUrl(envCompArg);
-
-        } else {
-            return buildJobUrl;
-        }
-    }
-
-
-    public String getField(String envCompArg, String column) {
-        String field = "UNKNOWN";
-        String queryString = "select top 1 " + column + " from env_dashboard where envcomp = '" + envCompArg + "' order by created_at desc";
-        try {
-            ResultSet rs = runQuery(queryString);
-            while (rs.next()) {
-                field = rs.getString(column);
-            }
-            closeDBConnection();
-        } catch (SQLException e) {
-            System.out.println("E9" + e.getMessage());
-            return "Error executing: " + queryString;
-        }
-        return field;
     }
 
     public HashMap getCompDeployed(String env, String time) {
@@ -282,6 +237,30 @@ public class EnvDashboardView extends View {
         }
         return deployment;
     }
+
+    public HashMap getCompLastDeployed(String env, String comp) {
+        HashMap<String, String> deployment;
+        deployment = new HashMap<String, String>();
+        String[] fields = {"buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at"};
+        String queryString = "select top 1 " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
+        try {
+            ResultSet rs = runQuery(queryString);
+            rs.next();
+            for (String field : fields) {
+                deployment.put(field, rs.getString(field));
+            }
+            closeDBConnection();
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 2000) {
+                //We'll assume this comp has never been deployed to this env            }
+            } else {
+                System.out.println("E12" + e.getMessage());
+                System.out.println("Error executing: " + queryString);
+            }
+        }
+        return deployment;
+    }
+
 
     public String getStatusChar(String statusWord) {
 

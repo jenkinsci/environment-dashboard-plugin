@@ -30,13 +30,13 @@
                                             <th>Last Update</th>
                                         </tbody>
                                         <j:forEach items="${it.getDeployments(envsHeader)}" var="time">
+                                        <j:set var="deployment" value="${it.getCompDeployed(envsHeader,time)}"/>
                                             <tr>
-                                                <td>${it.getCompDeployed(envsHeader,time).get("compName")}</td>
+                                                <td>${deployment.get("compName")}</td>
                                                 <td>
-                                                    <a title="View" href="${it.getCompDeployed(envsHeader,time).get('buildJobUrl')}">${it.getCompDeployed(envsHeader,time).get("buildNum")}</a>
-                                                                                                        ${it.getStatusChar(it.getCompDeployed(envsHeader,time).get("buildstatus"))}</td>
+                                                    <a title="View" href="${deployment.get('buildJobUrl')}">${deployment.get("buildNum")}</a>${it.getStatusChar(deployment.get("buildstatus"))}</td>
                                                     <td>
-                                                        <a title="View Deployment" href="${it.getCompDeployed(envsHeader,time).get('jobUrl')}">${it.getNiceTimeStamp(time)}</a>
+                                                        <a title="View Deployment" href="${deployment.get('jobUrl')}">${it.getNiceTimeStamp(time)}</a>
                                                     </td>
                                             </tr>
                                         </j:forEach>
@@ -49,52 +49,43 @@
                     <j:forEach items="${it.getOrderOfComps()}" var="comps">
                         <tr>
                             <td align="center"><strong>${comps}</strong></td>
+                            <j:forEach items="${it.getOrderOfEnvs()}" var="env">
+                                <j:set var="deployment" value="${it.getCompLastDeployed(env, comps)}"/>
+                                <j:if test="${!deployment.isEmpty()}">
+                                    <j:switch on="${deployment.get('buildstatus')}">
+                                        <j:case value="SUCCESS">
+                                            <j:set var="bgcol" value="#33C633;"/>
+                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="extn" value=""/>
+                                        </j:case>
+                                        <j:case value="FAILURE">
+                                            <j:set var="bgcol" value="#e74c3c;"/>
+                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="extn" value=""/>
+                                        </j:case>
+                                        <j:case value="RUNNING">
+                                            <j:set var="bgcol" value="#ffffff;"/>
+                                            <j:set var="clss" value="deploying"/>
+                                            <j:set var="extn" value="console"/>
+                                        </j:case>
+                                    </j:switch>
 
-                            <j:forEach items="${it.getOrderOfEnvs()}" var="envs">
-                                <j:set var="envComp" value="${it.getenvComps(envs, comps)}"/>
-                                <j:switch on="${it.getCurrentStatus(envComp)}">
-                                    <j:case value="SUCCESS">
-                                        <td style="background-color:#33C633;" align="center">
-                                            <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${it.getBuildUrl(envComp)}">
-                                                <strong>${from.getCurrentNum(envComp)}${it.getStatusChar("SUCCESS")}</strong>
-                                            </a>
-                                            <div align="right">
-                                                <code>
-                                                    <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a>
-                                                </code>
-                                            </div>
-                                        </td>
-                                    </j:case>
-                                    <j:case value="FAILURE">
-                                        <td style="background-color:#e74c3c;" align="center">
-                                            <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${it.getBuildUrl(envComp)}">
-                                                <strong>${from.getCurrentNum(envComp)}${it.getStatusChar("FAILURE")}</strong>
-                                            </a>
-                                            <div align="right">
-                                                <code>
-                                                    <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${it.getCurrentUrl(envComp)}">[${it.getCurrentTimestamp(envComp)}]</a>
-                                                </code>
-                                            </div>
-                                        </td>
-                                    </j:case>
-                                    <j:case value="RUNNING">
-                                        <td class="deploying" style="background-color:#3498db; color: #db7734" align="center">
-                                            <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${it.getBuildUrl(envComp)}">
-                                                <strong>${from.getCurrentNum(envComp)}${it.getStatusChar("RUNNING")}</strong>
-                                            </a>
-                                            <div align="right">
-                                                <code>
-                                                    <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${it.getCurrentUrl(envComp)}/console">[${it.getCurrentTimestamp(envComp)}]</a>
-                                                </code>
-                                            </div>
-                                        </td>
-                                    </j:case>
-                                    <j:default>
-                                        <td>
-                                            <div align="center" style="font-size:15px;">-</div>
-                                        </td>
-                                    </j:default>
-                                </j:switch>
+                                    <td class="${clss}" style="background-color:${bgcol}" align="center">
+                                        <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${deployment.get('buildJobUrl')}">
+                                            <strong>${deployment.get('buildNum')}${it.getStatusChar(deployment.get('buildstatus'))}</strong>
+                                        </a>
+                                        <div align="right">
+                                            <code>
+                                                <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${deployment.get('jobUrl')}${extn}">[${it.getNiceTimeStamp(deployment.get('created_at'))}]</a>
+                                            </code>
+                                        </div>
+                                    </td>
+                                </j:if>
+                                <j:if test="${deployment.isEmpty()}">
+                                    <td>
+                                        <div align="center" style="font-size:15px;">-</div>
+                                    </td>
+                                </j:if>
                             </j:forEach>
                         </tr>
                     </j:forEach>
