@@ -59,6 +59,8 @@ public class DashboardBuilder extends BuildWrapper {
         if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
             returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob);
             listener.getLogger().println("Pre-Build Update: " + returnComment);
+        } else {
+            listener.getLogger().println("Environment dashboard not updated: one or more required values were blank");
         }
         // TearDown - This runs post all build steps
         class TearDownImpl extends Environment {
@@ -80,7 +82,7 @@ public class DashboardBuilder extends BuildWrapper {
     }
 
     @SuppressWarnings("rawtypes")
-    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String bNumber, String runTime, String buildJob) {
+    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String currentBuildNum, String runTime, String buildJob) {
         String returnComment = null;
         if (envName.matches("^\\s*$") || compName.matches("^\\s*$")) {
             returnComment = "WARN: Either Environment name or Component name is empty.";
@@ -109,7 +111,7 @@ public class DashboardBuilder extends BuildWrapper {
             return returnComment;
         }
         try {
-            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum INTEGER, buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP,  buildJobUrl VARCHAR(255));");
+            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum VARCHAR(255), buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP,  buildJobUrl VARCHAR(255));");
         } catch (SQLException e) {
             returnComment = "WARN: Could not create table env_dashboard.";
             return returnComment;
@@ -130,18 +132,12 @@ public class DashboardBuilder extends BuildWrapper {
         if (buildJob.isEmpty()) {
             buildJobUrl = "";
         } else {
-            buildJobUrl = "job/" + buildJob + "/" + bNumber;
+            buildJobUrl = "job/" + buildJob + "/" + currentBuildNum;
         }
 
-		Integer currentBuild;
-		try { 
-			currentBuild = Integer.parseInt(bNumber); 
-		} catch(NumberFormatException e) { 
-			return "The build number provided is not an integer."; 
-		}
         String runQuery = null;
         if (runTime.equals("PRE")) {
-            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', " + currentBuild + ", '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "');";
+            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum + "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "');";
         } else {
             if (runTime.equals("POST")) {
                 runQuery = "UPDATE env_dashboard SET buildStatus = '" + currentBuildResult + "', created_at = current_timestamp WHERE envComp = '" + indexValueofTable +"' AND joburl = '" + currentBuildUrl + "'";
