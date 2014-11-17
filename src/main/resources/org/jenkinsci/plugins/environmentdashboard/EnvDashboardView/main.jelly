@@ -34,10 +34,25 @@
                                             <tr>
                                                 <td>${deployment.get("compName")}</td>
                                                 <td>
-                                                    <a title="View" href="${deployment.get('buildJobUrl')}">${deployment.get("buildNum")}</a>${it.getStatusChar(deployment.get("buildstatus"))}</td>
-                                                    <td>
-                                                        <a title="View Deployment" href="${deployment.get('jobUrl')}">${it.getNiceTimeStamp(time)}</a>
-                                                    </td>
+													<j:switch on="${deployment.get('buildstatus')}">
+                                                        <a title="View" href="${deployment.get('buildJobUrl')}">${deployment.get("buildNum")}</a>
+														<j:case value="SUCCESS">
+                                                            <span title="SUCCESS" style="color:green;">&#10004;</span>
+														</j:case>
+														<j:case value="FAILURE">
+                                                            <span title="FAILURE" style="color:darkred;">&#x2716;</span>
+														</j:case>
+														<j:case value="RUNNING">
+                                                            <span title="RUNNING" style="color:blue;">&#9658;</span>
+														</j:case>
+														<j:default>
+                                                            <span title="UNKNOWN" style="color:blue;">&#63;</span>
+														</j:default>
+													</j:switch>
+												</td>
+												<td>
+													<a title="View Deployment" href="${deployment.get('jobUrl')}">${it.getNiceTimeStamp(time)}</a>
+												</td>
                                             </tr>
                                         </j:forEach>
                                     </table>
@@ -72,7 +87,22 @@
 
                                     <td class="${clss}" style="background-color:${bgcol}" align="center">
                                         <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${deployment.get('buildJobUrl')}">
-                                            <strong>${deployment.get('buildNum')}${it.getStatusChar(deployment.get('buildstatus'))}</strong>
+                                            <strong>${deployment.get('buildNum')}
+												<j:switch on="${deployment.get('buildstatus')}">
+													<j:case value="SUCCESS">
+                                                        <span title="SUCCESS" style="color:green;">&#10004;</span>
+													</j:case>
+													<j:case value="FAILURE">
+                                                        <span title="FAILURE" style="color:darkred;">&#x2716;</span>
+													</j:case>
+													<j:case value="RUNNING">
+                                                        <span title="RUNNING" style="color:blue;">&#9658;</span>
+													</j:case>
+													<j:default>
+                                                        <span title="UNKNOWN" style="color:blue;">&#63;</span>
+													</j:default>
+												</j:switch>
+											</strong>
                                         </a>
                                         <div align="right">
                                             <code>
@@ -83,7 +113,7 @@
                                 </j:if>
                                 <j:if test="${deployment.isEmpty()}">
                                     <td>
-                                        <div align="center" style="font-size:15px;">-</div>
+                                        <div align="center" style="font-size:15px;"><strong>---</strong></div>
                                     </td>
                                 </j:if>
                             </j:forEach>

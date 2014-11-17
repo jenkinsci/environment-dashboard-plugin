@@ -257,25 +257,6 @@ public class EnvDashboardView extends View {
         return deployment;
     }
 
-
-    public String getStatusChar(String statusWord) {
-
-        String statusChar;
-
-        if ("SUCCESS".equals(statusWord)) {
-            statusChar = "<span title=\"" + statusWord  + "\" style=\"color:green;\">&#10004;</font>";
-        } else if ("FAILURE".equals(statusWord)) {
-            statusChar = "<span title=\"\" + statusWord  + \"\" style=\"color:darkred;\">&#x2716;</font>";
-        } else if ("RUNNING".equals(statusWord)) {
-            statusChar = "<span title=\"\" + statusWord  + \"\" style=\"color:blue;\">&#9658;</font>";
-        } else {
-            statusChar = "?";
-        }
-
-        return statusChar;
-    }
-
-
         @Override
     public Collection<TopLevelItem> getItems() {
         return null;

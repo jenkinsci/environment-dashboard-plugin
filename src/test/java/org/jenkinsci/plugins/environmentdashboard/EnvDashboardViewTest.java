@@ -114,11 +114,6 @@ public class EnvDashboardViewTest {
     }
 
     @Test
-    public void testGetStatusChar() throws Exception {
-
-    }
-
-    @Test
     public void testGetItems() throws Exception {
 
     }
