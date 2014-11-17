@@ -124,16 +124,6 @@ public class EnvDashboardViewTest {
     }
 
     @Test
-    public void testGetShowHeader() throws Exception {
-
-    }
-
-    @Test
-    public void testSetShowHeader() throws Exception {
-
-    }
-
-    @Test
     public void testGetEnvOrder() throws Exception {
 
     }

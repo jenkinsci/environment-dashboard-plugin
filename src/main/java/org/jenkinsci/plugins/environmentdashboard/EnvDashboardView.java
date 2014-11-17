@@ -24,15 +24,11 @@ public class EnvDashboardView extends View {
 
     private String compOrder = null;
 
-    private boolean showHeader = false;
-
-
     @DataBoundConstructor
-    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final boolean showHeader) {
+    public EnvDashboardView(final String name, final String envOrder, final String compOrder) {
         super(name, Hudson.getInstance());
         this.envOrder = envOrder;
         this.compOrder = compOrder;
-        this.showHeader = showHeader;
     }
 
     @Override
@@ -283,14 +279,6 @@ public class EnvDashboardView extends View {
         @Override
     public Collection<TopLevelItem> getItems() {
         return null;
-    }
-
-    public boolean getShowHeader() {
-        return showHeader;
-    }
-
-    public void setShowHeader(final boolean showHeader) {
-        this.showHeader = showHeader;
     }
 
     public String getEnvOrder() {
