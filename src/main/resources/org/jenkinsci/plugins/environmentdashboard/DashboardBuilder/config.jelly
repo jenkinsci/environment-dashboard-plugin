@@ -11,4 +11,9 @@
             <f:textbox />
         </f:entry>
 
+        <f:entry title="Build job" field="buildJob">
+            <f:textbox />
+        </f:entry>
+
+
 </j:jelly>

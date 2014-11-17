@@ -1,58 +1,130 @@
+<?xml version="1.0"?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-    <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-    <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
-    <link href="${rootURL}/plugin/environment-dashboard/css/blink.css" type="text/css" rel="stylesheet" />
-    <script type="text/javascript">
-        setInterval(function(){
-        var plugin = <st:bind value="${from}"/>;
-        plugin.writeHTML(function(t){
-        var Obj = document.getElementById('envDashboard');
-        Obj.parentNode.removeChild(Obj);
-        var str = t.responseObject();
-        var startDashboard = document.getElementById('startDashboard');
-        startDashboard.innerHTML = str;
-        })
-        },${it.getRefreshFrequencyInMillis()});
-    </script>
-    <div id="startDashboard">
-        <table id="envDashboard" class="table table-bordered">
-            <tbody>
-                <j:switch on="${it.anyJobsConfigured()}">
-                    <j:case value="NONE">
-                        <tr><div class="jumbotron"><h2>Hi, there!</h2><p>You possibly haven't set up any jobs to use the Dashboard. Or if you have, the job hasn't run atleast once. You can configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p></div></tr>
-                    </j:case>
-                    <j:case value="ENVS">
+<link href="${rootURL}/plugin/environment-dashboard/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+<link href="${rootURL}/plugin/environment-dashboard/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet"/>
+<link href="${rootURL}/plugin/environment-dashboard/css/blink.css" type="text/css" rel="stylesheet"/>
+<div id="startDashboard" onclick="hideAll()">
+    <table id="envDashboard" class="table table-bordered table-striped table-condensed">
+        <tbody>
+            <j:switch on="${it.anyJobsConfigured()}">
+                <j:case value="NONE">
+                    <tr>
+                        <div class="jumbotron">
+                            <h2>Hi, there!</h2>
+                            <p>You possibly haven't set up any jobs to use the Dashboard. Or if you have, the job hasn't run atleast once. You can configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p>
+                        </div>
+                    </tr>
+                </j:case>
+                <j:case value="ENVS">
+                    <tr align="center">
+                        <th/>
+                        <j:forEach items="${it.getOrderOfEnvs()}" var="envsHeader">
+                            <th style="text-align:center">
+                                <a style="text-decoration:none" title="View environment history" id="${envsHeader}_Header" href="javascript:toggle('${envsHeader}_History');">${envsHeader}</a>
+                                <div id="${envsHeader}_History" style="display: inline-block; position: fixed; top: 0; bottom: 0; left: 0; right: 0; width: 600px; height: 300px; position:absolute; margin: auto; padding: 10px; background-color: #FEFEFE; border: 1px solid; border-color: #DDDDDD; box-shadow: 1px 2px 1px #AAAAAA; border-radius: 15px; display:none; overflow: auto; overflow-x:hidden;">
+                                    <h3>${envsHeader}</h3>
+                                     <table class="table table-bordered table-striped table-condensed">
+                                        <tbody>
+                                            <th>Component</th>
+                                            <th>Build</th>
+                                            <th>Last Update</th>
+                                        </tbody>
+                                        <j:forEach items="${it.getDeployments(envsHeader)}" var="time">
+                                        <j:set var="deployment" value="${it.getCompDeployed(envsHeader,time)}"/>
+                                            <tr>
+                                                <td>${deployment.get("compName")}</td>
+                                                <td>
+                                                    <a title="View" href="${deployment.get('buildJobUrl')}">${deployment.get("buildNum")}</a>${it.getStatusChar(deployment.get("buildstatus"))}</td>
+                                                    <td>
+                                                        <a title="View Deployment" href="${deployment.get('jobUrl')}">${it.getNiceTimeStamp(time)}</a>
+                                                    </td>
+                                            </tr>
+                                        </j:forEach>
+                                    </table>
+                                </div>
+                            </th>
+                        </j:forEach>
+                    </tr>
+
+                    <j:forEach items="${it.getOrderOfComps()}" var="comps">
                         <tr>
-                            <td></td>
-                            <j:forEach items="${it.getOrderOfEnvs()}" var="envsHeader" >
-                                <th><div align="center">${envsHeader}</div></th>
-                            </j:forEach>
-                        </tr>
-                        <j:forEach items="${it.getOrderOfComps()}" var="comps" >
-                            <tr>
-                                <td><div align="center"><strong>${comps}</strong></div></td>
-                                <j:forEach items="${it.getOrderOfEnvs()}" var="envs" >
-                                    <j:set var="envComp" value="${it.getenvComps(envs, comps)}" />
-                                    <j:switch on="${it.getCurrentStatus(envComp)}">
+                            <td align="center"><strong>${comps}</strong></td>
+                            <j:forEach items="${it.getOrderOfEnvs()}" var="env">
+                                <j:set var="deployment" value="${it.getCompLastDeployed(env, comps)}"/>
+                                <j:if test="${!deployment.isEmpty()}">
+                                    <j:switch on="${deployment.get('buildstatus')}">
                                         <j:case value="SUCCESS">
-                                            <td style="background-color:#00bc8c; color: #bc0030"><div><a href="${it.getCurrentUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-ok" style="font-size:20px;"></i></div></a></div></td>
+                                            <j:set var="bgcol" value="#33C633;"/>
+                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="extn" value=""/>
                                         </j:case>
                                         <j:case value="FAILURE">
-                                            <td style="background-color:#e74c3c; color: #3cd7e7"><div><a href="${it.getCurrentUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-remove" style="font-size:20px;"></i></div></a></div></td>
+                                            <j:set var="bgcol" value="#e74c3c;"/>
+                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="extn" value=""/>
                                         </j:case>
                                         <j:case value="RUNNING">
-                                            <td class="deploying" style="background-color:#3498db; color: #db7734"><div><a href="${it.getCurrentUrl(envComp)}" style="text-decoration: none"><div align="center" style="font-size:15px;"><strong>${from.getCurrentNum(envComp)}</strong><st:nbsp/><st:nbsp/><i class="glyphicon glyphicon-play" style="font-size:20px;"></i></div></a></div></td>
+                                            <j:set var="bgcol" value="#ffffff;"/>
+                                            <j:set var="clss" value="deploying"/>
+                                            <j:set var="extn" value="console"/>
                                         </j:case>
-                                        <j:default>
-                                            <td style="background-color:#332C2F; color: #FFFFFF"><div><div align="center" style="font-size:15px;">No deploys</div></div></td>
-                                        </j:default>
                                     </j:switch>
-                                </j:forEach>
-                            </tr>
-                        </j:forEach>
-                    </j:case>
-                </j:switch>
-            </tbody>
-        </table>
-    </div>
+
+                                    <td class="${clss}" style="background-color:${bgcol}" align="center">
+                                        <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${deployment.get('buildJobUrl')}">
+                                            <strong>${deployment.get('buildNum')}${it.getStatusChar(deployment.get('buildstatus'))}</strong>
+                                        </a>
+                                        <div align="right">
+                                            <code>
+                                                <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${deployment.get('jobUrl')}${extn}">[${it.getNiceTimeStamp(deployment.get('created_at'))}]</a>
+                                            </code>
+                                        </div>
+                                    </td>
+                                </j:if>
+                                <j:if test="${deployment.isEmpty()}">
+                                    <td>
+                                        <div align="center" style="font-size:15px;">-</div>
+                                    </td>
+                                </j:if>
+                            </j:forEach>
+                        </tr>
+                    </j:forEach>
+
+                    <script language="javascript">
+                        function toggle(showHideDiv) {
+                            hideAll()
+                            var ele = document.getElementById(showHideDiv);
+                            if(ele.style.display == "block") {
+                                ele.style.display = "none";
+                            }
+                            else {
+                                ele.style.display = "block";
+                            }
+                        }
+
+                        function hideAll() {
+
+                            var divs = document.getElementsByTagName("div");
+                            var tableDivs = new Array();
+                            for (var i = 0; i &lt; divs.length; i++) {
+                                if (divs[i].id.match("_History") != null) {
+                                    tableDivs.push(divs[i]);
+                                }
+                            }
+
+                            var envs = tableDivs.length;
+                            for (i = 0; i &lt; envs; i++) {
+                                var ele = tableDivs[i];
+                                if(ele.style.display == "block") {
+                                    ele.style.display = "none";
+                                }
+                            }
+
+                        }
+                    </script>
+                </j:case>
+            </j:switch>
+        </tbody>
+    </table>
+</div>
 </j:jelly>

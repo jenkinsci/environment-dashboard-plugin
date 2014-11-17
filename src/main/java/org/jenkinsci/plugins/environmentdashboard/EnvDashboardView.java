@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.File;
 import java.io.IOException;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import java.sql.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -23,22 +24,15 @@ public class EnvDashboardView extends View {
 
     private String compOrder = null;
 
-    private int refreshInterval = 10;
-    
     private boolean showHeader = false;
 
 
     @DataBoundConstructor
-    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final int refreshInterval, final boolean showHeader) {
+    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final boolean showHeader) {
         super(name, Hudson.getInstance());
         this.envOrder = envOrder;
         this.compOrder = compOrder;
         this.showHeader = showHeader;
-        if (refreshInterval < 10) {
-            this.refreshInterval = 10;
-        } else {
-            this.refreshInterval = refreshInterval;
-        }
     }
 
     @Override
@@ -108,6 +102,7 @@ public class EnvDashboardView extends View {
     String jenkinsDashboardDb = (jenkinsHome + File.separator + "jenkins_dashboard");
 
     public ResultSet runQuery(String queryString) {
+
         ResultSet rs = null;
         try {
             Class.forName("org.h2.Driver");
@@ -117,13 +112,13 @@ public class EnvDashboardView extends View {
         try {
             conn = DriverManager.getConnection("jdbc:h2:" + jenkinsDashboardDb);
         } catch (SQLException e) {
-            System.out.println("E2");
+            System.out.println("E2" + e.getMessage());
         }
         try {
             assert conn != null;
             stat = conn.createStatement();
         } catch (SQLException e) {
-            System.out.println("E3");
+            System.out.println("E3" + e.getMessage());
         }
         try {
             assert stat != null;
@@ -167,61 +162,6 @@ public class EnvDashboardView extends View {
         return orderOfEnvs;
     }
 
-    @JavaScriptMethod
-    public String writeHTML() {
-
-        ArrayList<String> newOrderOfEnvs;
-        ArrayList<String> newOrderOfComps;
-
-        newOrderOfEnvs = getOrderOfEnvs();
-
-        String finalHTML;
-
-        if (newOrderOfEnvs == null || newOrderOfEnvs.isEmpty()) {
-            finalHTML = "<table id=\"envDashboard\"><tr><div class=\"jumbotron\"><h1>Hi, there!</h1><p>You possible haven't set up any jobs to use the Dashboard. Configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p></div></tr></table>";
-            return finalHTML;
-        }
-
-        newOrderOfComps = getOrderOfComps();
-
-        finalHTML = "        <table id=\"envDashboard\" class=\"table table-bordered\"><tbody>" +
-                "            <tr>" +
-                "            <td></td>";
-        for (String head : newOrderOfEnvs) {
-            if (!(head == null || head.matches("^\\s*$"))) {
-                finalHTML = finalHTML + "<th><div align=\"center\">" + head + "</div></th>";
-            }
-        }
-        finalHTML = finalHTML + "</tr>";
-        for (String comps : newOrderOfComps) {
-            if (comps == null || comps.matches("^\\s*$")) {
-                continue;
-            }
-            finalHTML = finalHTML + "<tr><td><div align=\"center\"><strong>" + comps + "</strong></div></td>";
-            for (String envs : newOrderOfEnvs) {
-                if (envs == null || envs.matches("^\\s*$")) {
-                    continue;
-                }
-                String finalEnvComp = envs + "=" + comps;
-                String finalStatus = getCurrentStatus(finalEnvComp);
-                String finalUrl = getCurrentUrl(finalEnvComp);
-                String finalNumber = getCurrentNum(finalEnvComp);
-                if (finalStatus.equals("SUCCESS")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#00bc8c; color: #bc0030\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-ok\" style=\"font-size:20px;\"></i></div></a></div></td>";
-                } else if (finalStatus.equals("RUNNING")) {
-                    finalHTML = finalHTML + "<td class=\"deploying\" style=\"background-color:#3498db; color: #db7734\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-play\" style=\"font-size:20px;\"></i></div></a></div></td>";
-                } else if (finalStatus.equals("FAILURE")) {
-                    finalHTML = finalHTML + "<td style=\"background-color:#e74c3c; color: #3cd7e7\"><div><a href=\"" + finalUrl + "\" style=\"text-decoration: none\"><div align=\"center\" style=\"font-size:15px;\"><strong>" + finalNumber + "</strong>&nbsp; &nbsp;<i class=\"glyphicon glyphicon-remove\" style=\"font-size:20px;\"></i></div></a></div></td>";
-                } else {
-                    finalHTML = finalHTML + "<td style=\"background-color:#332C2F; color: #FFFFFF\"><div><div align=\"center\" style=\"font-size:15px;\">No deploys</div></div></td>";
-                }
-            }
-            finalHTML = finalHTML + "</tr>";
-        }
-        finalHTML = finalHTML + "</tbody></table>";
-        return finalHTML;
-    }
-
     public ArrayList<String> getOrderOfComps() {
         ArrayList<String> orderOfComps;
         orderOfComps = splitCompOrder(compOrder);
@@ -236,11 +176,29 @@ public class EnvDashboardView extends View {
                 }
                 closeDBConnection();
             } catch (SQLException e) {
-                System.out.println("E8");
+                System.out.println("E8" + e.getMessage());
                 return null;
             }
         }
         return orderOfComps;
+    }
+
+    public ArrayList<String> getDeployments(String env) {
+        ArrayList<String> deployments;
+        deployments = new ArrayList<String>();
+        String queryString="select created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
+            try {
+                ResultSet rs = runQuery(queryString);
+                while (rs.next()) {
+                    deployments.add(rs.getString("created_at"));
+                }
+                closeDBConnection();
+            } catch (SQLException e) {
+                System.out.println("E11" + e.getMessage());
+                return null;
+            }
+        return deployments;
+
     }
 
     public String getenvComps(String env, String comp) {
@@ -257,65 +215,74 @@ public class EnvDashboardView extends View {
         }
     }
 
-    public String getCurrentStatus(String envCompArg){
-        String envCompBuildStatus = "UNKNOWN";
-        String queryString = "SELECT ed.buildstatus AS status FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
+    public String getNiceTimeStamp(String timeStamp) {
+        return timeStamp.substring(0,19);
+    }
+
+    public HashMap getCompDeployed(String env, String time) {
+        HashMap<String, String> deployment;
+        deployment = new HashMap<String, String>();
+        String[] fields = {"buildstatus", "compName", "buildJobUrl", "jobUrl", "buildNum"};
+        String queryString = "select " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and created_at = '" + time + "';";
         try {
             ResultSet rs = runQuery(queryString);
-            while (rs.next()) {
-                envCompBuildStatus = rs.getString("status");
+            rs.next();
+            for (String field : fields) {
+                deployment.put(field, rs.getString(field));
             }
             closeDBConnection();
         } catch (SQLException e) {
-            System.out.println("E9");
-            return "Error executing build status query!";
+            System.out.println("E10" + e.getMessage());
+            System.out.println("Error executing: " + queryString);
         }
-        return envCompBuildStatus;
+        return deployment;
     }
 
-    public String getCurrentUrl(String envCompArg){
-        String envCompBuildUrl = "UNKNOWN";
-        String queryString = "SELECT ed.joburl AS url FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
+    public HashMap getCompLastDeployed(String env, String comp) {
+        HashMap<String, String> deployment;
+        deployment = new HashMap<String, String>();
+        String[] fields = {"buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at"};
+        String queryString = "select top 1 " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
         try {
             ResultSet rs = runQuery(queryString);
-            while (rs.next()) {
-                envCompBuildUrl = rs.getString("url");
+            rs.next();
+            for (String field : fields) {
+                deployment.put(field, rs.getString(field));
             }
             closeDBConnection();
         } catch (SQLException e) {
-            System.out.println("E10");
-            return "Error executing build url query!";
-        }
-        return envCompBuildUrl;
-    }
-
-    public String getCurrentNum(String envCompArg){
-        String envCompBuildNumber = "UNKNOWN";
-        String queryString = "SELECT ed.buildnum AS number FROM env_dashboard ed INNER JOIN (SELECT envcomp, MAX(created_at) AS MaxDateTime FROM env_dashboard GROUP BY envcomp) groupeded ON ed.envcomp =  groupeded.envcomp AND ed.created_at = groupeded.MaxDateTime AND ed.envcomp = '" + envCompArg + "';";
-        try {
-            ResultSet rs = runQuery(queryString);
-            while (rs.next()) {
-                envCompBuildNumber = rs.getString("number");
+            if (e.getErrorCode() == 2000) {
+                //We'll assume this comp has never been deployed to this env            }
+            } else {
+                System.out.println("E12" + e.getMessage());
+                System.out.println("Error executing: " + queryString);
             }
-            closeDBConnection();
-        } catch (SQLException e) {
-            System.out.println("E11");
-            return "Error executing build number query!";
         }
-        return envCompBuildNumber;
+        return deployment;
     }
 
-    @Override
+
+    public String getStatusChar(String statusWord) {
+
+        String statusChar;
+
+        if ("SUCCESS".equals(statusWord)) {
+            statusChar = "<span title=\"" + statusWord  + "\" style=\"color:green;\">&#10004;</font>";
+        } else if ("FAILURE".equals(statusWord)) {
+            statusChar = "<span title=\"\" + statusWord  + \"\" style=\"color:darkred;\">&#x2716;</font>";
+        } else if ("RUNNING".equals(statusWord)) {
+            statusChar = "<span title=\"\" + statusWord  + \"\" style=\"color:blue;\">&#9658;</font>";
+        } else {
+            statusChar = "?";
+        }
+
+        return statusChar;
+    }
+
+
+        @Override
     public Collection<TopLevelItem> getItems() {
         return null;
-    }
-
-    public int getRefreshInterval() {
-        return refreshInterval;
-    }
-
-    public void setRefreshInterval(final int refreshInterval) {
-        this.refreshInterval = refreshInterval;
     }
 
     public boolean getShowHeader() {
@@ -324,10 +291,6 @@ public class EnvDashboardView extends View {
 
     public void setShowHeader(final boolean showHeader) {
         this.showHeader = showHeader;
-    }
-
-    public int getRefreshFrequencyInMillis() {
-        return refreshInterval * 1000;
     }
 
     public String getEnvOrder() {
