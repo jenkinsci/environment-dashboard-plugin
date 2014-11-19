@@ -109,9 +109,6 @@ public class EnvDashboardView extends View {
         return orderOfComps;
     }
 
-    String jenkinsHome = Hudson.getInstance().root.toString();
-    String jenkinsDashboardDb = (jenkinsHome + File.separator + "jenkins_dashboard");
-
     public ResultSet runQuery(String queryString) {
 
         ResultSet rs = null;
