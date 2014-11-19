@@ -55,7 +55,6 @@ public class DashboardBuilder extends BuildWrapper {
 
     @SuppressWarnings("rawtypes")
     @Override
-
     public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         // PreBuild
         String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
