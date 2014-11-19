@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.model.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -114,16 +115,10 @@ public class EnvDashboardView extends View {
     public ResultSet runQuery(String queryString) {
 
         ResultSet rs = null;
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("E1");
-        }
-        try {
-            conn = DriverManager.getConnection("jdbc:h2:" + jenkinsDashboardDb);
-        } catch (SQLException e) {
-            System.out.println("E2" + e.getMessage());
-        }
+        
+        //Get DB connection
+        conn = DBConnection.getConnection();
+        
         try {
             assert conn != null;
             stat = conn.createStatement();
@@ -137,15 +132,6 @@ public class EnvDashboardView extends View {
             System.out.println("E4" + e.getMessage());
         }
         return rs;
-    }
-
-    public void closeDBConnection() {
-        try {
-            stat.close();
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println("E5");
-        }
     }
 
     public ArrayList<String> getOrderOfEnvs() {
@@ -163,7 +149,7 @@ public class EnvDashboardView extends View {
                         orderOfEnvs.add(rs.getString("envName"));
                     }
                 }
-                closeDBConnection();
+                DBConnection.closeConnection();
             } catch (SQLException e) {
                 System.out.println("E6" + e.getMessage());
                 return null;
@@ -184,7 +170,7 @@ public class EnvDashboardView extends View {
                         orderOfComps.add(rs.getString("compName"));
                     }
                 }
-                closeDBConnection();
+                DBConnection.closeConnection();
             } catch (SQLException e) {
                 System.out.println("E8" + e.getMessage());
                 return null;
@@ -202,7 +188,7 @@ public class EnvDashboardView extends View {
                 while (rs.next()) {
                     deployments.add(rs.getString("created_at"));
                 }
-                closeDBConnection();
+                DBConnection.closeConnection();
             } catch (SQLException e) {
                 System.out.println("E11" + e.getMessage());
                 return null;
@@ -240,7 +226,7 @@ public class EnvDashboardView extends View {
             for (String field : fields) {
                 deployment.put(field, rs.getString(field));
             }
-            closeDBConnection();
+            DBConnection.closeConnection();
         } catch (SQLException e) {
             System.out.println("E10" + e.getMessage());
             System.out.println("Error executing: " + queryString);
@@ -259,7 +245,7 @@ public class EnvDashboardView extends View {
             for (String field : fields) {
                 deployment.put(field, rs.getString(field));
             }
-            closeDBConnection();
+            DBConnection.closeConnection();
         } catch (SQLException e) {
             if (e.getErrorCode() == 2000) {
                 //We'll assume this comp has never been deployed to this env            }

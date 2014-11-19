@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
+import org.jenkinsci.plugins.model.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -94,21 +95,10 @@ public class DashboardBuilder extends BuildWrapper {
             returnComment = "WARN: Either Environment name or Component name is empty.";
             return returnComment;
         }
-        String jenkinsHome = Hudson.getInstance().root.toString();
-        String jenkinsDashboardDb = (jenkinsHome + File.separator + "jenkins_dashboard");
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            returnComment = "WARN: Could not acquire Class org.h2.Driver.";
-            return returnComment;
-        }
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection("jdbc:h2:" + jenkinsDashboardDb);
-        } catch (SQLException e) {
-            returnComment = "WARN: Could not acquire connection to H2 DB.";
-            return returnComment;
-        }
+        
+        //Get DB connection
+        Connection conn = DBConnection.getConnection();
+        
         Statement stat = null;
         try {
             stat = conn.createStatement();
