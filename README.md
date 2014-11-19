@@ -3,7 +3,7 @@ Jenkins Environment Dashboard Plugin
 
 This Jenkins plugin creates a custom view which can be used as a dashboard to display what code release versions have been deployed to what test and production environments (or devices).
 
-[![Build Status](https://jenkins.ci.cloudbees.com/job/plugins/job/environment-dashboard/badge/icon)](https://jenkins.ci.cloudbees.com/job/plugins/job/environment-dashboard/)
+![Dashboard](https://github.com/vipinsthename/environment-dashboard/raw/master/img/dashboard.png)
 
 ## Example set up ##
 
