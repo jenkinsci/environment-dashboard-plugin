@@ -5,6 +5,10 @@ This Jenkins plugin creates a custom view which can be used as a dashboard to di
 
 ![Dashboard](https://github.com/vipinsthename/environment-dashboard/raw/master/img/dashboard.png)
 
+Click on the Environment name to get a historical view of the deployments.
+
+![Dashboard history](https://github.com/vipinsthename/environment-dashboard/raw/master/img/dashboard_history.png)
+
 ## Example set up ##
 
 You have 3 software components:
