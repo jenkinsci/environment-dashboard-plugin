@@ -51,7 +51,7 @@ public class DBConnection {
 			try {
 				DBConnection.con.close();
 				return true;
-			} catch (SQLException error) { return false; }
+			} catch (SQLException error) { System.err.println("E5"); return false; }
 		}
 		//default  - failed to close
 		return false;
