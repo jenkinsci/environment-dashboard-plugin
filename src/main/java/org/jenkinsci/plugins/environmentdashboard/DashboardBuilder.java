@@ -1,22 +1,29 @@
 package org.jenkinsci.plugins.environmentdashboard;
 
-import hudson.Launcher;
 import hudson.Extension;
-import hudson.model.*;
-import java.io.*;
+import hudson.Launcher;
+import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
+import hudson.model.Hudson;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
-import java.io.IOException;
 import hudson.util.FormValidation;
-import org.kohsuke.stapler.DataBoundConstructor;
-import java.sql.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.ServletException;
+
 import net.sf.json.JSONObject;
+
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import javax.servlet.ServletException;
 
 public class DashboardBuilder extends BuildWrapper {
 

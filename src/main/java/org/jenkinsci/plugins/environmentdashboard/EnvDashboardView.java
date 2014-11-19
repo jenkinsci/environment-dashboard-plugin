@@ -1,18 +1,32 @@
 package org.jenkinsci.plugins.environmentdashboard;
 
-import hudson.model.*;
 import hudson.Extension;
-import java.util.*;
+import hudson.model.Item;
+import hudson.model.TopLevelItem;
+import hudson.model.Descriptor.FormException;
+import hudson.model.Hudson;
+import hudson.model.View;
+import hudson.model.ViewDescriptor;
+
 import java.io.File;
 import java.io.IOException;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.StaplerRequest;
-import java.sql.*;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.bind.JavaScriptMethod;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+
 import javax.servlet.ServletException;
-import hudson.model.Descriptor.FormException;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 /**
