@@ -49,6 +49,9 @@ public class DashboardBuilder extends BuildWrapper {
     public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         // PreBuild
         final Integer numberOfDays = getDescriptor().getNumberOfDays();
+        if ( numberOfDays == null ) {
+            numberOfDays = 30;
+        }
         listener.getLogger().println("The number of days are " + numberOfDays);
         String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
         String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
