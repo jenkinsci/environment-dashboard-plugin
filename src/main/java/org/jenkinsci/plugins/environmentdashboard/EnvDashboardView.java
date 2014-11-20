@@ -1,22 +1,33 @@
 package org.jenkinsci.plugins.environmentdashboard;
 
-import hudson.model.*;
 import hudson.Extension;
-import java.util.*;
-import java.io.File;
+import hudson.model.Item;
+import hudson.model.TopLevelItem;
+import hudson.model.Descriptor.FormException;
+import hudson.model.Hudson;
+import hudson.model.View;
+import hudson.model.ViewDescriptor;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.StaplerRequest;
-import java.sql.*;
+import org.jenkinsci.plugins.model.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.bind.JavaScriptMethod;
-import javax.servlet.ServletException;
-import hudson.model.Descriptor.FormException;
+import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 /**
- * Created by v.raveendran.nair on 15/10/2014.
+ * Class to provide build wrapper for Dashboard.
+ * @author vipin
+ * @date 15/10/2014
  */
 public class EnvDashboardView extends View {
 
@@ -94,22 +105,13 @@ public class EnvDashboardView extends View {
         return orderOfComps;
     }
 
-    String jenkinsHome = Hudson.getInstance().root.toString();
-    String jenkinsDashboardDb = (jenkinsHome + File.separator + "jenkins_dashboard");
-
     public ResultSet runQuery(String queryString) {
 
         ResultSet rs = null;
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("E1");
-        }
-        try {
-            conn = DriverManager.getConnection("jdbc:h2:" + jenkinsDashboardDb);
-        } catch (SQLException e) {
-            System.out.println("E2" + e.getMessage());
-        }
+
+        //Get DB connection
+        conn = DBConnection.getConnection();
+
         try {
             assert conn != null;
             stat = conn.createStatement();
@@ -149,7 +151,7 @@ public class EnvDashboardView extends View {
                         orderOfEnvs.add(rs.getString("envName"));
                     }
                 }
-                closeDBConnection();
+                DBConnection.closeConnection();;
             } catch (SQLException e) {
                 System.out.println("E6" + e.getMessage());
                 return null;
@@ -170,7 +172,7 @@ public class EnvDashboardView extends View {
                         orderOfComps.add(rs.getString("compName"));
                     }
                 }
-                closeDBConnection();
+                DBConnection.closeConnection();;
             } catch (SQLException e) {
                 System.out.println("E8" + e.getMessage());
                 return null;
@@ -188,7 +190,7 @@ public class EnvDashboardView extends View {
                 while (rs.next()) {
                     deployments.add(rs.getString("created_at"));
                 }
-                closeDBConnection();
+                DBConnection.closeConnection();;
             } catch (SQLException e) {
                 System.out.println("E11" + e.getMessage());
                 return null;
@@ -226,7 +228,7 @@ public class EnvDashboardView extends View {
             for (String field : fields) {
                 deployment.put(field, rs.getString(field));
             }
-            closeDBConnection();
+            DBConnection.closeConnection();;
         } catch (SQLException e) {
             System.out.println("E10" + e.getMessage());
             System.out.println("Error executing: " + queryString);
@@ -245,7 +247,7 @@ public class EnvDashboardView extends View {
             for (String field : fields) {
                 deployment.put(field, rs.getString(field));
             }
-            closeDBConnection();
+            DBConnection.closeConnection();;
         } catch (SQLException e) {
             if (e.getErrorCode() == 2000) {
                 //We'll assume this comp has never been deployed to this env            }

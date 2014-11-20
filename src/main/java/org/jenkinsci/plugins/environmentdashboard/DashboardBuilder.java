@@ -1,19 +1,29 @@
 package org.jenkinsci.plugins.environmentdashboard;
 
-import hudson.Launcher;
 import hudson.Extension;
-import hudson.model.*;
+import hudson.Launcher;
+import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
-import java.io.File;
-import java.io.IOException;
 import hudson.util.FormValidation;
-import org.kohsuke.stapler.DataBoundConstructor;
-import java.sql.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.model.DBConnection;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import javax.servlet.ServletException;
+
+/**
+ * Class to create Dashboard view.
+ * @author vipin
+ * @date 15/10/2014
+ */
 
 public class DashboardBuilder extends BuildWrapper {
 
@@ -45,10 +55,9 @@ public class DashboardBuilder extends BuildWrapper {
 
     @SuppressWarnings("rawtypes")
     @Override
-
     public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         // PreBuild
-        final Integer numberOfDays = ( getDescriptor().getNumberOfDays() == null ? 30 : getDescriptor().getNumberOfDays() );
+        final Integer numberOfDays = ( (getDescriptor().getNumberOfDays() == null) ? 30 : getDescriptor().getNumberOfDays() );
         String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
         String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
         String passedCompName = build.getEnvironment(listener).expand(componentName);
@@ -86,21 +95,10 @@ public class DashboardBuilder extends BuildWrapper {
             returnComment = "WARN: Either Environment name or Component name is empty.";
             return returnComment;
         }
-        String jenkinsHome = Hudson.getInstance().root.toString();
-        String jenkinsDashboardDb = (jenkinsHome + File.separator + "jenkins_dashboard");
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            returnComment = "WARN: Could not acquire Class org.h2.Driver.";
-            return returnComment;
-        }
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection("jdbc:h2:" + jenkinsDashboardDb);
-        } catch (SQLException e) {
-            returnComment = "WARN: Could not acquire connection to H2 DB.";
-            return returnComment;
-        }
+
+        //Get DB connection
+        Connection conn = DBConnection.getConnection();
+
         Statement stat = null;
         try {
             stat = conn.createStatement();
