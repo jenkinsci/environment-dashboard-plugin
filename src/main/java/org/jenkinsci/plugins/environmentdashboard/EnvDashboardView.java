@@ -191,6 +191,9 @@ public class EnvDashboardView extends View {
     }
 
     public ArrayList<String> getDeployments(String env, Integer lastDeploy) {
+        if ( lastDeploy <= 0 ) {
+            lastDeploy = 10;
+        }
         ArrayList<String> deployments;
         deployments = new ArrayList<String>();
         String queryString="select top " + lastDeploy + " created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
