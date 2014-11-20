@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.model;
+package org.jenkinsci.plugins.environmentdashboard.utils;
 
 import hudson.model.Hudson;
 
@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * Singleton class to represent a single DB connection. 
  * @author robertnorthard
- * @date 18/10/2012
+ * @date 18/10/2014
  */
 public class DBConnection {
 
