@@ -35,11 +35,14 @@ public class EnvDashboardView extends View {
 
     private String compOrder = null;
 
+    private String deployHistory = null;
+
     @DataBoundConstructor
-    public EnvDashboardView(final String name, final String envOrder, final String compOrder) {
+    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final String deployHistory) {
         super(name, Hudson.getInstance());
         this.envOrder = envOrder;
         this.compOrder = compOrder;
+        this.deployHistory = deployHistory;
     }
 
     @Override
@@ -57,6 +60,7 @@ public class EnvDashboardView extends View {
 
         private String envOrder;
         private String compOrder;
+        private String deployHistory;
 
         /**
          * descriptor impl constructor This empty constructor is required for stapler. If you remove this constructor, text name of
@@ -80,10 +84,10 @@ public class EnvDashboardView extends View {
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             envOrder = formData.getString("envOrder");
             compOrder = formData.getString("compOrder");
+            deployHistory = formData.getString("deployHistory");
             save();
             return super.configure(req,formData);
         }
-
     }
 
     Connection conn = null;
@@ -127,15 +131,6 @@ public class EnvDashboardView extends View {
         return rs;
     }
 
-    public void closeDBConnection() {
-        try {
-            stat.close();
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println("E5");
-        }
-    }
-
     public ArrayList<String> getOrderOfEnvs() {
         ArrayList<String> orderOfEnvs;
         orderOfEnvs = splitEnvOrder(envOrder);
@@ -151,7 +146,7 @@ public class EnvDashboardView extends View {
                         orderOfEnvs.add(rs.getString("envName"));
                     }
                 }
-                DBConnection.closeConnection();;
+                DBConnection.closeConnection();
             } catch (SQLException e) {
                 System.out.println("E6" + e.getMessage());
                 return null;
@@ -172,7 +167,7 @@ public class EnvDashboardView extends View {
                         orderOfComps.add(rs.getString("compName"));
                     }
                 }
-                DBConnection.closeConnection();;
+                DBConnection.closeConnection();
             } catch (SQLException e) {
                 System.out.println("E8" + e.getMessage());
                 return null;
@@ -181,26 +176,35 @@ public class EnvDashboardView extends View {
         return orderOfComps;
     }
 
-    public ArrayList<String> getDeployments(String env) {
+    public Integer getLimitDeployHistory() {
+        Integer lastDeploy;
+        if ( deployHistory == null || deployHistory.equals("") ) {
+            return 10;
+        } else {
+            try {
+                lastDeploy = Integer.parseInt(deployHistory);
+            } catch (NumberFormatException e) {
+                return 10;
+            }
+        }
+        return lastDeploy;
+    }
+
+    public ArrayList<String> getDeployments(String env, Integer lastDeploy) {
         ArrayList<String> deployments;
         deployments = new ArrayList<String>();
-        String queryString="select created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
+        String queryString="select top " + lastDeploy + " created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
             try {
                 ResultSet rs = runQuery(queryString);
                 while (rs.next()) {
                     deployments.add(rs.getString("created_at"));
                 }
-                DBConnection.closeConnection();;
+                DBConnection.closeConnection();
             } catch (SQLException e) {
                 System.out.println("E11" + e.getMessage());
                 return null;
             }
         return deployments;
-
-    }
-
-    public String getenvComps(String env, String comp) {
-        return env + "=" + comp;
     }
 
     public String anyJobsConfigured() {
@@ -228,7 +232,7 @@ public class EnvDashboardView extends View {
             for (String field : fields) {
                 deployment.put(field, rs.getString(field));
             }
-            DBConnection.closeConnection();;
+            DBConnection.closeConnection();
         } catch (SQLException e) {
             System.out.println("E10" + e.getMessage());
             System.out.println("Error executing: " + queryString);
@@ -247,7 +251,7 @@ public class EnvDashboardView extends View {
             for (String field : fields) {
                 deployment.put(field, rs.getString(field));
             }
-            DBConnection.closeConnection();;
+            DBConnection.closeConnection();
         } catch (SQLException e) {
             if (e.getErrorCode() == 2000) {
                 //We'll assume this comp has never been deployed to this env            }
@@ -259,7 +263,7 @@ public class EnvDashboardView extends View {
         return deployment;
     }
 
-        @Override
+    @Override
     public Collection<TopLevelItem> getItems() {
         return null;
     }
@@ -278,6 +282,14 @@ public class EnvDashboardView extends View {
 
     public void setCompOrder(final String compOrder) {
         this.compOrder = compOrder;
+    }
+
+    public String getDeployHistory() {
+        return deployHistory;
+    }
+
+    public void setDeployHistory(final String deployHistory) {
+        this.deployHistory = deployHistory;
     }
 
     @Override

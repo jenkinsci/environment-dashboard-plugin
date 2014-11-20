@@ -29,7 +29,8 @@
                                             <th align="center">Build</th>
                                             <th align="center">Last Update</th>
                                         </tbody>
-                                        <j:forEach items="${it.getDeployments(envsHeader)}" var="time">
+                                        <j:set var="limitDeploy" value="${it.getLimitDeployHistory()}"/>
+                                        <j:forEach items="${it.getDeployments(envsHeader, limitDeploy)}" var="time">
                                         <j:set var="deployment" value="${it.getCompDeployed(envsHeader,time)}"/>
                                             <tr>
                                                 <td>${deployment.get("compName")}</td>

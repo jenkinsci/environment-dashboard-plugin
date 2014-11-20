@@ -145,7 +145,7 @@ public class DashboardBuilder extends BuildWrapper {
             returnComment = "Error running insert query " + runQuery + ".";
             return returnComment;
         }
-        if ( numberOfDays != 0 ) {
+        if ( numberOfDays > 0 ) {
             runQuery = "DELETE FROM env_dashboard where created_at <= current_timestamp - " + numberOfDays;
             try {
                 stat.execute(runQuery);
