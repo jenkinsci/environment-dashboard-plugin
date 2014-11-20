@@ -9,4 +9,8 @@
         <f:textbox />
     </f:entry>
 
+    <f:entry title="Limit deploy history to last X deploys" field="deployHistory">
+        <f:textbox default="10"/>
+    </f:entry>
+
 </j:jelly>

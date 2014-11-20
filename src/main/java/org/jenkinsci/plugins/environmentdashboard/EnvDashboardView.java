@@ -7,11 +7,16 @@ import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.View;
 import hudson.model.ViewDescriptor;
+<<<<<<< HEAD
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+=======
+import java.io.IOException;
+import java.sql.Connection;
+>>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,9 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+<<<<<<< HEAD
 
 import javax.servlet.ServletException;
 
+=======
+import javax.servlet.ServletException;
+>>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +40,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 /**
- * Created by v.raveendran.nair on 15/10/2014.
+ * Class to provide build wrapper for Dashboard.
+ * @author vipin
+ * @date 15/10/2014
  */
 public class EnvDashboardView extends View {
 
@@ -39,11 +50,14 @@ public class EnvDashboardView extends View {
 
     private String compOrder = null;
 
+    private String deployHistory = null;
+
     @DataBoundConstructor
-    public EnvDashboardView(final String name, final String envOrder, final String compOrder) {
+    public EnvDashboardView(final String name, final String envOrder, final String compOrder, final String deployHistory) {
         super(name, Hudson.getInstance());
         this.envOrder = envOrder;
         this.compOrder = compOrder;
+        this.deployHistory = deployHistory;
     }
 
     @Override
@@ -61,6 +75,7 @@ public class EnvDashboardView extends View {
 
         private String envOrder;
         private String compOrder;
+        private String deployHistory;
 
         /**
          * descriptor impl constructor This empty constructor is required for stapler. If you remove this constructor, text name of
@@ -84,10 +99,10 @@ public class EnvDashboardView extends View {
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             envOrder = formData.getString("envOrder");
             compOrder = formData.getString("compOrder");
+            deployHistory = formData.getString("deployHistory");
             save();
             return super.configure(req,formData);
         }
-
     }
 
     Connection conn = null;
@@ -176,10 +191,27 @@ public class EnvDashboardView extends View {
         return orderOfComps;
     }
 
-    public ArrayList<String> getDeployments(String env) {
+    public Integer getLimitDeployHistory() {
+        Integer lastDeploy;
+        if ( deployHistory == null || deployHistory.equals("") ) {
+            return 10;
+        } else {
+            try {
+                lastDeploy = Integer.parseInt(deployHistory);
+            } catch (NumberFormatException e) {
+                return 10;
+            }
+        }
+        return lastDeploy;
+    }
+
+    public ArrayList<String> getDeployments(String env, Integer lastDeploy) {
+        if ( lastDeploy <= 0 ) {
+            lastDeploy = 10;
+        }
         ArrayList<String> deployments;
         deployments = new ArrayList<String>();
-        String queryString="select created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
+        String queryString="select top " + lastDeploy + " created_at from env_dashboard where envName ='" + env + "' order by created_at desc;";
             try {
                 ResultSet rs = runQuery(queryString);
                 while (rs.next()) {
@@ -191,11 +223,6 @@ public class EnvDashboardView extends View {
                 return null;
             }
         return deployments;
-
-    }
-
-    public String getenvComps(String env, String comp) {
-        return env + "=" + comp;
     }
 
     public String anyJobsConfigured() {
@@ -254,7 +281,7 @@ public class EnvDashboardView extends View {
         return deployment;
     }
 
-        @Override
+    @Override
     public Collection<TopLevelItem> getItems() {
         return null;
     }
@@ -273,6 +300,14 @@ public class EnvDashboardView extends View {
 
     public void setCompOrder(final String compOrder) {
         this.compOrder = compOrder;
+    }
+
+    public String getDeployHistory() {
+        return deployHistory;
+    }
+
+    public void setDeployHistory(final String deployHistory) {
+        this.deployHistory = deployHistory;
     }
 
     @Override

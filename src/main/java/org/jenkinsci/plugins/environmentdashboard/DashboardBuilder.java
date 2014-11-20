@@ -5,6 +5,7 @@ import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+<<<<<<< HEAD
 import hudson.model.Hudson;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
@@ -21,10 +22,30 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
+=======
+import hudson.tasks.BuildWrapper;
+import hudson.tasks.BuildWrapperDescriptor;
+import hudson.util.FormValidation;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.servlet.ServletException;
+import net.sf.json.JSONObject;
+>>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 import org.jenkinsci.plugins.model.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+<<<<<<< HEAD
+=======
+
+/**
+ * Class to create Dashboard view.
+ * @author vipin
+ * @date 15/10/2014
+ */
+>>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 
 public class DashboardBuilder extends BuildWrapper {
 
@@ -58,13 +79,14 @@ public class DashboardBuilder extends BuildWrapper {
     @Override
     public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         // PreBuild
+        final Integer numberOfDays = ( (getDescriptor().getNumberOfDays() == null) ? 30 : getDescriptor().getNumberOfDays() );
         String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
         String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
         String passedCompName = build.getEnvironment(listener).expand(componentName);
         String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
         String returnComment = null;
         if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
-            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob);
+            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob, numberOfDays);
             listener.getLogger().println("Pre-Build Update: " + returnComment);
         } else {
             listener.getLogger().println("Environment dashboard not updated: one or more required values were blank");
@@ -79,7 +101,7 @@ public class DashboardBuilder extends BuildWrapper {
                 String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
                 String returnComment = null;
                 if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
-                    returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST", passedBuildJob);
+                    returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST", passedBuildJob, numberOfDays);
                     listener.getLogger().println("Post-Build Update: " + returnComment);
                 }
                 return super.tearDown(build, listener);
@@ -89,16 +111,16 @@ public class DashboardBuilder extends BuildWrapper {
     }
 
     @SuppressWarnings("rawtypes")
-    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String currentBuildNum, String runTime, String buildJob) {
+    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String currentBuildNum, String runTime, String buildJob, Integer numberOfDays) {
         String returnComment = null;
         if (envName.matches("^\\s*$") || compName.matches("^\\s*$")) {
             returnComment = "WARN: Either Environment name or Component name is empty.";
             return returnComment;
         }
-        
+
         //Get DB connection
         Connection conn = DBConnection.getConnection();
-        
+
         Statement stat = null;
         try {
             stat = conn.createStatement();
@@ -145,6 +167,15 @@ public class DashboardBuilder extends BuildWrapper {
             returnComment = "Error running insert query " + runQuery + ".";
             return returnComment;
         }
+        if ( numberOfDays > 0 ) {
+            runQuery = "DELETE FROM env_dashboard where created_at <= current_timestamp - " + numberOfDays;
+            try {
+                stat.execute(runQuery);
+            } catch (SQLException e) {
+                returnComment = "Error running delete query " + runQuery + ".";
+                return returnComment;
+            }
+        }
         try {
             stat.close();
             conn.close();
@@ -155,6 +186,7 @@ public class DashboardBuilder extends BuildWrapper {
         return "Updated Dashboard DB";
     }
 
+
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
@@ -163,11 +195,8 @@ public class DashboardBuilder extends BuildWrapper {
     @Extension
     public static final class DescriptorImpl extends BuildWrapperDescriptor {
 
-        private String nameOfEnv;
-        private String componentName;
-        private String buildNumber;
-        private String buildJob;
-
+        private String numberOfDays = "30";
+        private Integer parseNumberOfDays;
         public DescriptorImpl() {
             load();
         }
@@ -198,18 +227,37 @@ public class DashboardBuilder extends BuildWrapper {
             return FormValidation.ok();
         }
 
+        public FormValidation doCheckNumberOfDays(@QueryParameter String value)
+                throws IOException, ServletException {
+            if (value.length() == 0) {
+                return FormValidation.error("Please set the number of days to retain the DB data.");
+            } else {
+                try {
+                    parseNumberOfDays = Integer.parseInt(value);
+                } catch(Exception parseEx) {
+                    return FormValidation.error("Please provide an integer value.");
+                }
+            }
+            return FormValidation.ok();
+        }
+
         public boolean isApplicable(AbstractProject<?, ?> item) {
             return true;
         }
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-            nameOfEnv = formData.getString("nameOfEnv");
-            componentName = formData.getString("componentName");
-            buildNumber = formData.getString("buildNumber");
-            buildJob = formData.getString("buildJob");
+            numberOfDays = formData.getString("numberOfDays");
+            if (numberOfDays == null || numberOfDays.equals(""))
+            {
+                numberOfDays = "30";
+            }
             save();
             return super.configure(req,formData);
+        }
+
+        public Integer getNumberOfDays() {
+            return parseNumberOfDays;
         }
 
     }
