@@ -32,7 +32,6 @@ You configure your deployment jobs to publish a record of each deployment to thi
 
 You create a view which displays a matrix with rows for your 3 applications, columns for your environments and the intersections with the deployed code version.
 
-
 Other information:
 * Bug Tracker for known issues and expectations : [Jenkins Build Flow Component](https://issues.jenkins-ci.org/browse/JENKINS/component/TBC)
 * Discussions on this plugin are hosted on  [jenkins-user mailing list](https://wiki.jenkins-ci.org/display/JENKINS/Mailing+Lists)
@@ -43,7 +42,6 @@ Configuration
 
 After installing the plugin, you'll get a new option in the Build Environment section of a job configuration page.  If your job deploys to an environment, check the box and complete the form using the context sensitive help.
 
+You can also specify how long to retain the dashboard data, the default is set to 30 days. Any data older than 30 days from the current time is automatically deleted.
 
-Once you have run at least one job with a populated Details for Environment dashboard section, you now have enough data to generate a dashboard.  On the Jenkins home page, click the + to create a new view and create a view.  If you leave all settings blank, you will see the deployments of all components into all environments.
-
-
+Once you have run at least one job with a populated Details for Environment dashboard section, you now have enough data to generate a dashboard.  On the Jenkins home page, click the + to create a new view and create a view.  If you leave all settings blank, you will see the deployments of all components into all environments. You can also limit the deployment history shown when you click on the environment name on the dashboard. The default is last 10 deploys.
