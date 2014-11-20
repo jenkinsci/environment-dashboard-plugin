@@ -5,16 +5,12 @@ import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-<<<<<<< HEAD
-import hudson.model.Hudson;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
 import hudson.util.FormValidation;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -22,31 +18,16 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
-=======
-import hudson.tasks.BuildWrapper;
-import hudson.tasks.BuildWrapperDescriptor;
-import hudson.util.FormValidation;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import javax.servlet.ServletException;
-import net.sf.json.JSONObject;
->>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 import org.jenkinsci.plugins.model.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-<<<<<<< HEAD
-=======
 
 /**
  * Class to create Dashboard view.
  * @author vipin
  * @date 15/10/2014
  */
->>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
-
 public class DashboardBuilder extends BuildWrapper {
 
     private final String nameOfEnv;

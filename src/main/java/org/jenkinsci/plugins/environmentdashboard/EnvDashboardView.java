@@ -7,16 +7,9 @@ import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.View;
 import hudson.model.ViewDescriptor;
-<<<<<<< HEAD
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-=======
-import java.io.IOException;
-import java.sql.Connection;
->>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,13 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-<<<<<<< HEAD
 
 import javax.servlet.ServletException;
 
-=======
-import javax.servlet.ServletException;
->>>>>>> 5800cfacb3e8b06287a33f5b5e7de8402658b518
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
