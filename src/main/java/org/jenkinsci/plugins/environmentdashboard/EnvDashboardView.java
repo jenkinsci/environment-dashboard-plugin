@@ -7,6 +7,7 @@ import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.View;
 import hudson.model.ViewDescriptor;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -16,10 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+
 import javax.servlet.ServletException;
+
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.model.DBConnection;
+import org.jenkinsci.plugins.environmentdashboard.utils.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -112,10 +116,10 @@ public class EnvDashboardView extends View {
     public ResultSet runQuery(String queryString) {
 
         ResultSet rs = null;
-
+        
         //Get DB connection
         conn = DBConnection.getConnection();
-
+        
         try {
             assert conn != null;
             stat = conn.createStatement();

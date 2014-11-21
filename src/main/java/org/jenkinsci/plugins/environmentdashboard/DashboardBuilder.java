@@ -8,13 +8,17 @@ import hudson.model.AbstractProject;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
 import hudson.util.FormValidation;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import javax.servlet.ServletException;
+
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.model.DBConnection;
+
+import org.jenkinsci.plugins.environmentdashboard.utils.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -24,7 +28,6 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author vipin
  * @date 15/10/2014
  */
-
 public class DashboardBuilder extends BuildWrapper {
 
     private final String nameOfEnv;
