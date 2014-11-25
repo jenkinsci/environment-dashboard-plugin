@@ -3,7 +3,7 @@
   
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>environment-dashboard</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Environment Dashboard Plugin</name>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/environment-dashboard+plugin</url>
@@ -72,10 +72,6 @@
       <id>maven.jenkins-ci.org</id>
       <url>http://maven.jenkins-ci.org/content/repositories/snapshots</url>
     </snapshotRepository>
-    <site>
-      <id>github-pages</id>
-      <url>gitsite:git@github.com/jenkinsci/maven-site.git:plugin-parent/environment-dashboard</url>
-    </site>
   </distributionManagement>
 
 </project>
