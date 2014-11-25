@@ -37,6 +37,7 @@
   <scm>
     <connection>scm:git:https://github.com/vipinsthename/environment-dashboard.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/vipinsthename/environment-dashboard.git</developerConnection>
+	<url>scm:git:https://github.com/vipinsthename/environment-dashboard.git</url>
 	<tag>HEAD</tag>
   </scm>
   
