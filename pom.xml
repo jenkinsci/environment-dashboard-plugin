@@ -3,7 +3,7 @@
   
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>environment-dashboard</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <packaging>hpi</packaging>
   <name>Environment Dashboard Plugin</name>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/environment-dashboard+plugin</url>
@@ -38,7 +38,7 @@
     <connection>scm:git:https://github.com/vipinsthename/environment-dashboard.git</connection>
     <developerConnection>scm:git:https://github.com/vipinsthename/environment-dashboard.git</developerConnection>
 	<url>scm:git:https://github.com/vipinsthename/environment-dashboard.git</url>
-	<tag>HEAD</tag>
+	<tag>environment-dashboard-1.0.3</tag>
   </scm>
   
   <developers>
