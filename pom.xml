@@ -3,7 +3,7 @@
   
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>environment-dashboard</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.3-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Environment Dashboard Plugin</name>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/environment-dashboard+plugin</url>
@@ -69,5 +69,26 @@
       <url>http://repo.jenkins-ci.org/releases</url>
     </repository>
   </distributionManagement>
+
+  <build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.4.1</version>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.maven.scm</groupId>
+                    <artifactId>maven-scm-api</artifactId>
+                    <version>1.9</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.maven.scm</groupId>
+                    <artifactId>maven-scm-provider-gitexe</artifactId>
+                    <version>1.9</version>
+                </dependency>
+            </dependencies>
+        </plugin>
+    </plugins>
+  </build>
 
 </project>
