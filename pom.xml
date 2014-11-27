@@ -6,7 +6,7 @@
   <version>1.0.4-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Environment Dashboard Plugin</name>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/environment-dashboard+plugin</url>
+  <url>https://wiki.jenkins-ci.org/display/JENKINS/Environment+dashboard+plugin</url>
 	
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
