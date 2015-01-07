@@ -37,7 +37,7 @@ public class DashboardBuilder extends BuildWrapper {
     private final String packageName;
 
     @DataBoundConstructor
-    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob) {
+    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName) {
         this.nameOfEnv = nameOfEnv;
         this.componentName = componentName;
         this.buildNumber = buildNumber;
@@ -88,7 +88,6 @@ public class DashboardBuilder extends BuildWrapper {
                 String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
                 String passedPackageName = build.getEnvironment(listener).expand(packageName);
                 String returnComment = null;
-                if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$") )) {
                 if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
                     returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST", passedBuildJob, numberOfDays, passedPackageName);
                     listener.getLogger().println("Post-Build Update: " + returnComment);
@@ -100,7 +99,7 @@ public class DashboardBuilder extends BuildWrapper {
     }
 
     @SuppressWarnings("rawtypes")
-    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String currentBuildNum, String runTime, String buildJob, Integer numberOfDays) {
+    private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName, String currentBuildNum, String runTime, String buildJob, Integer numberOfDays, String packageName) {
         String returnComment = null;
         if (envName.matches("^\\s*$") || compName.matches("^\\s*$")) {
             returnComment = "WARN: Either Environment name or Component name is empty.";
