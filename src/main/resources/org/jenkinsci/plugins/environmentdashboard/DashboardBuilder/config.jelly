@@ -15,5 +15,9 @@
             <f:textbox />
         </f:entry>
 
+        <f:entry title="Deployed Packagename" field="packageName">
+            <f:textbox />                                         
+        </f:entry>                                                
+
 
 </j:jelly>
