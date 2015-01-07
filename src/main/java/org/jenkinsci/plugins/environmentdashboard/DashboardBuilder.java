@@ -34,6 +34,7 @@ public class DashboardBuilder extends BuildWrapper {
     private final String componentName;
     private final String buildNumber;
     private final String buildJob;
+    private final String packageName;
 
     @DataBoundConstructor
     public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob) {
@@ -41,6 +42,7 @@ public class DashboardBuilder extends BuildWrapper {
         this.componentName = componentName;
         this.buildNumber = buildNumber;
         this.buildJob = buildJob;
+        this.packageName = packageName;
     }
 
     public String getNameOfEnv() {
@@ -55,6 +57,9 @@ public class DashboardBuilder extends BuildWrapper {
     public String getBuildJob() {
         return buildJob;
     }
+    public String getPackageName() {
+        return packageName;
+    }
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -65,9 +70,10 @@ public class DashboardBuilder extends BuildWrapper {
         String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
         String passedCompName = build.getEnvironment(listener).expand(componentName);
         String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
+        String passedPackageName = build.getEnvironment(listener).expand(packageName);
         String returnComment = null;
         if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
-            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob, numberOfDays);
+            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob, numberOfDays, passedPackageName);
             listener.getLogger().println("Pre-Build Update: " + returnComment);
         } else {
             listener.getLogger().println("Environment dashboard not updated: one or more required values were blank");
@@ -80,9 +86,11 @@ public class DashboardBuilder extends BuildWrapper {
                 String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
                 String passedCompName = build.getEnvironment(listener).expand(componentName);
                 String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
+                String passedPackageName = build.getEnvironment(listener).expand(packageName);
                 String returnComment = null;
+                if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$") )) {
                 if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
-                    returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST", passedBuildJob, numberOfDays);
+                    returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "POST", passedBuildJob, numberOfDays, passedPackageName);
                     listener.getLogger().println("Post-Build Update: " + returnComment);
                 }
                 return super.tearDown(build, listener);
@@ -110,7 +118,7 @@ public class DashboardBuilder extends BuildWrapper {
             return returnComment;
         }
         try {
-            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum VARCHAR(255), buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP,  buildJobUrl VARCHAR(255));");
+            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum VARCHAR(255), buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP,  buildJobUrl VARCHAR(255), packageName VARCHAR(255));");
         } catch (SQLException e) {
             returnComment = "WARN: Could not create table env_dashboard.";
             return returnComment;
@@ -136,7 +144,7 @@ public class DashboardBuilder extends BuildWrapper {
 
         String runQuery = null;
         if (runTime.equals("PRE")) {
-            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum + "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "');";
+            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum + "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "' , '" + packageName + "');";
         } else {
             if (runTime.equals("POST")) {
                 runQuery = "UPDATE env_dashboard SET buildStatus = '" + currentBuildResult + "', created_at = current_timestamp WHERE envComp = '" + indexValueofTable +"' AND joburl = '" + currentBuildUrl + "'";

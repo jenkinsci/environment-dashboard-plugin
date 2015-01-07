@@ -231,7 +231,7 @@ public class EnvDashboardView extends View {
     public HashMap getCompDeployed(String env, String time) {
         HashMap<String, String> deployment;
         deployment = new HashMap<String, String>();
-        String[] fields = {"buildstatus", "compName", "buildJobUrl", "jobUrl", "buildNum"};
+        String[] fields = {"buildstatus", "compName", "buildJobUrl", "jobUrl", "buildNum", "packageName"};
         String queryString = "select " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and created_at = '" + time + "';";
         try {
             ResultSet rs = runQuery(queryString);
@@ -250,7 +250,7 @@ public class EnvDashboardView extends View {
     public HashMap getCompLastDeployed(String env, String comp) {
         HashMap<String, String> deployment;
         deployment = new HashMap<String, String>();
-        String[] fields = {"buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at"};
+        String[] fields = {"buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName"};
         String queryString = "select top 1 " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
         try {
             ResultSet rs = runQuery(queryString);
