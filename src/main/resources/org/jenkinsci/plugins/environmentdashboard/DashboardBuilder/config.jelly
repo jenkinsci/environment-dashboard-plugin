@@ -15,9 +15,8 @@
             <f:textbox />
         </f:entry>
 
-        <f:entry title="Deployed Packagename" field="packageName">
-            <f:textbox />                                         
-        </f:entry>                                                
-
+        <f:entry title="Package Name" description="Optional. Package name will be shown on dashboard for each component/environment. This replaces the build number info on the dashboard. In some cases this is a better description of the build." field="packageName">
+            <f:textbox />
+        </f:entry>
 
 </j:jelly>
