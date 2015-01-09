@@ -47,7 +47,7 @@
                                                             <span title="RUNNING" style="color:blue;">&#9658;</span>
 														</j:case>
 														<j:default>
-                                                            <span title="UNKNOWN" style="color:blue;">&#63;</span>
+                                                            <span title="UNKNOWN" style="color:#bf7b18;">&#63;</span>
 														</j:default>
 													</j:switch>
 												</td>
@@ -84,6 +84,11 @@
                                             <j:set var="clss" value="deploying"/>
                                             <j:set var="extn" value="console"/>
                                         </j:case>
+                                        <j:default>
+                                            <j:set var="bgcol" value="#e7a23c;"/>
+                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="extn" value=""/>
+                                        </j:default>
                                     </j:switch>
 
                                     <td class="${clss}" style="background-color:${bgcol}" align="center">
@@ -100,7 +105,7 @@
                                                         <span title="RUNNING" style="color:blue;">&#9658;</span>
 													</j:case>
 													<j:default>
-                                                        <span title="UNKNOWN" style="color:blue;">&#63;</span>
+                                                        <span title="UNKNOWN" style="color:#bf7b18;">&#63;</span>
 													</j:default>
 												</j:switch>
 											</strong>
