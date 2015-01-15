@@ -92,8 +92,10 @@
                                     </j:switch>
 
                                     <td class="${clss}" style="background-color:${bgcol}" align="center">
-                                        <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${deployment.get('buildJobUrl')}">
-                                            <strong>${deployment.get('buildNum')}
+                                        <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="javascript:toggle('${comps}_${env}_Popup');">
+                                            <strong>
+                                                <j:if test="${deployment.get('packageName').equals('')}">${deployment.get('buildNum')}</j:if>
+                                                <j:if test="${!deployment.get('packageName').equals('')}">${deployment.get('packageName')}</j:if>
 												<j:switch on="${deployment.get('buildstatus')}">
 													<j:case value="SUCCESS">
                                                         <span title="SUCCESS" style="color:green;">&#10004;</span>
