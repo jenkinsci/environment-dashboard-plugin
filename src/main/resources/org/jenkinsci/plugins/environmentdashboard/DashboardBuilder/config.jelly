@@ -16,7 +16,23 @@
         </f:entry>
 
         <f:entry title="Package Name" description="Optional. Package name will be shown on dashboard for each component/environment. This replaces the build number info on the dashboard. In some cases this is a better description of the build." field="packageName">
-            <f:textbox />
+        <f:textbox />
+        </f:entry>
+
+        <f:entry>
+            <f:repeatable field="data" var="item" minimum="${1}" items="${descriptor.data}">
+                <table>
+                    <f:entry field="columnName" title="${%columnName}">
+                        <f:textbox value="${item.columnName}" />
+                    </f:entry>
+                    <f:entry field="contents" title="${%contents}">
+                        <f:textbox value="${item.contents}"/>
+                    </f:entry>
+                    <f:entry>
+                         <div align="right"> <f:repeatableDeleteButton /> </div> 
+                    </f:entry>
+                </table>
+            </f:repeatable>
         </f:entry>
 
 </j:jelly>
