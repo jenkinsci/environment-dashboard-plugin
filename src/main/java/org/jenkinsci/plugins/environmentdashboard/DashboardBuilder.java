@@ -43,10 +43,9 @@ public class DashboardBuilder extends BuildWrapper {
     private final String packageName;
     private List<ListItem> data = Collections.emptyList();
     public boolean addColumns = false;
-    private static final Logger LOGGER = Logger.getLogger(DashboardBuilder.class.getName());
 
     @DataBoundConstructor
-    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName) {
+    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName, boolean addColumns, List<ListItem> data) {
         this.nameOfEnv = nameOfEnv;
         this.componentName = componentName;
         this.buildNumber = buildNumber;
