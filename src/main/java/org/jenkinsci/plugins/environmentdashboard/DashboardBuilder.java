@@ -35,14 +35,22 @@ public class DashboardBuilder extends BuildWrapper {
     private final String buildNumber;
     private final String buildJob;
     private final String packageName;
+    private List<ListItem> data = Collections.emptyList();
+    public boolean addColumns = false;
 
     @DataBoundConstructor
-    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName) {
+    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName, boolean addColumns, List<ListItem> data) {
         this.nameOfEnv = nameOfEnv;
         this.componentName = componentName;
         this.buildNumber = buildNumber;
         this.buildJob = buildJob;
         this.packageName = packageName;
+        this.addColumns = addColumns;
+        if(this.addColumns){
+            this.data = data;
+        }else{
+            this.data = Collections.emptyList();
+        }
     }
 
     public String getNameOfEnv() {
@@ -72,6 +80,13 @@ public class DashboardBuilder extends BuildWrapper {
         String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
         String passedPackageName = build.getEnvironment(listener).expand(packageName);
         String returnComment = null;
+        if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
+            returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob, numberOfDays, passedPackageName);
+            listener.getLogger().println("Pre-Build Update: " + returnComment);
+        } else {
+            listener.getLogger().println("Environment dashboard not updated: one or more required values were blank");
+        }
+
         if (!(passedBuildNumber.matches("^\\s*$") || passedEnvName.matches("^\\s*$") || passedCompName.matches("^\\s*$"))) {
             returnComment = writeToDB(build, listener, passedEnvName, passedCompName, passedBuildNumber, "PRE", passedBuildJob, numberOfDays, passedPackageName);
             listener.getLogger().println("Pre-Build Update: " + returnComment);
