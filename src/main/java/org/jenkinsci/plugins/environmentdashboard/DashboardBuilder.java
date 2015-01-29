@@ -52,6 +52,16 @@ public class DashboardBuilder extends BuildWrapper {
         this.buildNumber = buildNumber;
         this.buildJob = buildJob;
         this.packageName = packageName;
+        if (addColumns){
+            this.addColumns = addColumns;
+        }else {
+            this.addColumns=false;
+        }
+        if(this.addColumns){
+            this.data = data;
+        }else{
+            this.data = Collections.emptyList();
+        }
     }
 
     public String getNameOfEnv() {
@@ -81,7 +91,16 @@ public class DashboardBuilder extends BuildWrapper {
         String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
         String passedPackageName = build.getEnvironment(listener).expand(packageName);
         List<ListItem> passedColumnData = new ArrayList<ListItem>();
-        passedColumnData.add(new ListItem("HotCold", "Cold"));
+        if (addColumns){
+            for (ListItem item : data){
+                passedColumnData.add(
+                        new ListItem(
+                            build.getEnvironment(listener).expand(item.columnName),
+                            build.getEnvironment(listener).expand(item.contents)
+                            )
+                        );
+            }
+        }
         String returnComment = null;
 
         if (passedPackageName== null){
