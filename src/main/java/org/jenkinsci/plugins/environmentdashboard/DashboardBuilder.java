@@ -152,6 +152,18 @@ public class DashboardBuilder extends BuildWrapper {
             returnComment = "WARN: Could not alter table env_dashboard.";
             return returnComment;
         }
+        String columns = "";
+        String contents = "";
+        for (ListItem item : passedColumnData){
+            columns = columns + ", " +  item.columnName;
+            contents = contents + "', '" + item.contents;
+            try {
+                stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS " + item.columnName + " VARCHAR;");
+            } catch (SQLException e) {
+                returnComment = "WARN: Could not alter table env_dashboard to add column " + item.columnName + ".";
+                return returnComment;
+            }
+        }
         String indexValueofTable = envName + '=' + compName;
         String currentBuildResult = "UNKNOWN";
         if (build.getResult() == null && runTime.equals("PRE")) {
