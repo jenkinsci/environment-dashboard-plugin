@@ -122,6 +122,14 @@ public class DashboardBuilder extends BuildWrapper {
             returnComment = "WARN: Could not create table env_dashboard.";
             return returnComment;
         }
+        try {
+            //This alter table command caters for an upgrade from previous version of plugin
+            stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS packageName VARCHAR(255);");
+        } catch (SQLException e) {
+            returnComment = "WARN: Could not alter table env_dashboard.";
+            return returnComment;
+        }
+                
         String indexValueofTable = envName + '=' + compName;
         String currentBuildResult = "UNKNOWN";
         if (build.getResult() == null && runTime.equals("PRE")) {
@@ -143,7 +151,7 @@ public class DashboardBuilder extends BuildWrapper {
 
         String runQuery = null;
         if (runTime.equals("PRE")) {
-            runQuery = "INSERT INTO env_dashboard VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum + "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "' , '" + packageName + "');";
+            runQuery = "INSERT INTO env_dashboard (envComp, jobUrl, buildNum, buildStatus, envName, compName, created_at, buildJobUrl, packageName) VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum + "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "' , '" + packageName + "');";
         } else {
             if (runTime.equals("POST")) {
                 runQuery = "UPDATE env_dashboard SET buildStatus = '" + currentBuildResult + "', created_at = current_timestamp WHERE envComp = '" + indexValueofTable +"' AND joburl = '" + currentBuildUrl + "'";
