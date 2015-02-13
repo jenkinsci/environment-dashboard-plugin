@@ -94,8 +94,6 @@ public class EnvDashboardView extends View {
         }
     }
 
-    Connection conn = null;
-    Statement stat = null;
 
     public ArrayList<String> splitEnvOrder(String envOrder) {
         ArrayList<String> orderOfEnvs = new ArrayList<String>();
@@ -114,6 +112,8 @@ public class EnvDashboardView extends View {
     }
 
     public ResultSet runQuery(String queryString) {
+        Connection conn = null;
+        Statement stat = null;
 
         ResultSet rs = null;
         
