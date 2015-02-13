@@ -51,7 +51,7 @@
 														</j:default>
 													</j:switch>
 												</td>
-												<td>
+                                                <td>
 													<a title="View Deployment" href="${deployment.get('jobUrl')}">${it.getNiceTimeStamp(time)}</a>
 												</td>
                                             </tr>
@@ -92,7 +92,7 @@
                                     </j:switch>
 
                                     <td class="${clss}" style="background-color:${bgcol}" align="center">
-                                        <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="javascript:toggle('${comps}_${env}_Popup');">
+                                        <a style="text-decoration:none; color:blue; font-size:x-large;" title="View" href="${deployment.get('jobUrl')}">
                                             <strong>
                                                 <j:if test="${deployment.get('packageName').equals('')}">${deployment.get('buildNum')}</j:if>
                                                 <j:if test="${!deployment.get('packageName').equals('')}">${deployment.get('packageName')}</j:if>
