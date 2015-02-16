@@ -7,6 +7,8 @@ import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.View;
 import hudson.model.ViewDescriptor;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -27,6 +29,7 @@ import org.jenkinsci.plugins.environmentdashboard.utils.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Class to provide build wrapper for Dashboard.
@@ -99,16 +102,6 @@ public class EnvDashboardView extends View {
             load();
         }
 
-        /**
-         * get the display name
-         *
-         * @return display name
-         */
-        @Override
-        public String getDisplayName() {
-            return "Environment Dashboard";
-        }
-
         public static ArrayList<String> getCustomColumns(){
             Connection conn = null;
             Statement stat = null;
@@ -153,6 +146,57 @@ public class EnvDashboardView extends View {
                 return null;
             }
             return columns;
+        }
+
+
+        public ListBoxModel doFillColumnItems() {
+            ListBoxModel m = new ListBoxModel();
+            ArrayList<String> columns = getCustomColumns();
+            int position = 0;
+            m.add("Select column to remove", "");
+            for (String col : columns){
+                m.add(col, col);
+            }
+            return m;
+        }
+
+        @SuppressWarnings("unused")
+        public FormValidation doDropColumn(@QueryParameter("column") final String column){
+            Connection conn = null;
+            Statement stat = null;
+            if ("".equals(column)){
+                return FormValidation.ok(); 
+            }
+            String queryString = "ALTER TABLE ENV_DASHBOARD DROP COLUMN " + column + ";";
+            //Get DB connection
+            conn = DBConnection.getConnection();
+
+            try {
+                assert conn != null;
+                stat = conn.createStatement();
+            } catch (SQLException e) {
+                return FormValidation.error("Failed to create statement."); 
+            }
+            try {
+                assert stat != null;
+                stat.execute(queryString);
+            } catch (SQLException e) {
+                DBConnection.closeConnection();
+                return FormValidation.error("Failed to remove column: " + column + "\nThis column may have already been removed. Refresh to update the list of columns to remove."); 
+            } 
+            DBConnection.closeConnection();
+
+            return FormValidation.ok("Successfully removed column " + column + ".");
+        }
+
+        /**
+         * get the display name
+         *
+         * @return display name
+         */
+        @Override
+        public String getDisplayName() {
+            return "Environment Dashboard";
         }
 
         @Override

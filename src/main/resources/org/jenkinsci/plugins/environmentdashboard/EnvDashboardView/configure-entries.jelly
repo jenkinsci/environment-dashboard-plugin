@@ -13,4 +13,17 @@
         <f:textbox default="10"/>
     </f:entry>
 
+    <f:advanced>
+
+        <f:entry title="Custom Columns" field="column" >
+            <f:select id="selectColumn" onclick="updateListBox('selectColumn', '/descriptorByName/org.jenkinsci.plugins.environmentdashboard.EnvDashboardView/fillColumnItems')" />
+        </f:entry>
+
+        <f:entry >
+            <f:validateButton title="${%Drop column}" progress="${%Processing...}"
+                method="dropColumn" with="column" />
+        </f:entry>
+
+    </f:advanced>
+
 </j:jelly>
