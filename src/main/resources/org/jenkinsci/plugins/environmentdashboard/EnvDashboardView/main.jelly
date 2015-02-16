@@ -104,7 +104,7 @@
                                                     </j:if>
                                                 </j:forEach>
                                                 <th style="width:8%;text-align:center">Status</th>
-                                                <th align="center">Time</th>
+                                                <th style="text-align:center">Time</th>
                                             </tbody>
                                             
                                             <j:forEach items="${it.getDeploymentsByCompEnv(comp, envsHeader, limitDeploy)}" var="deployment">
@@ -160,13 +160,13 @@
                                         <h3>${comp} History</h3>
                                          <table class="table table-bordered table-striped table-condensed">
                                             <tbody>
-                                                <th align="center">Env</th>
-                                                <th align="center">Build</th>
-                                                <th align="center">Status</th>
+                                                <th style="text-align:center">Env</th>
+                                                <th style="text-align:center">Build</th>
+                                                <th style="text-align:center">Status</th>
                                                 <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
-                                                    <th align="center">Package</th>
+                                                    <th style="text-align:center">Package</th>
                                                 </j:if>
-                                                <th align="center">Time</th>
+                                                <th style="text-align:center">Time</th>
                                             </tbody>
                                             
                                             <j:forEach items="${it.getDeploymentsByComp(comp, limitDeploy)}" var="deployment">
@@ -248,7 +248,7 @@
                                                 <j:if test="${!deployment.get('packageName').equals('') &amp;&amp; deployment.get('packageName') != null}">${deployment.get('packageName')}</j:if>
 												<j:switch on="${deployment.get('buildstatus')}">
 													<j:case value="SUCCESS">
-                                                        <span title="SUCCESS" style="color:green;"></span>
+                                                        <span title="SUCCESS" style="color:green;">&#10004;</span>
 													</j:case>
 													<j:case value="FAILURE">
                                                         <span title="FAILURE" style="color:darkred;">&#x2716;</span>
