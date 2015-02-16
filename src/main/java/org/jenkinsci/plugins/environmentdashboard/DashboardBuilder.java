@@ -78,6 +78,9 @@ public class DashboardBuilder extends BuildWrapper {
     public String getPackageName() {
         return packageName;
     }
+    public List<ListItem> getData(){
+        return data;
+    }
 
     @SuppressWarnings("rawtypes")
     @Override
