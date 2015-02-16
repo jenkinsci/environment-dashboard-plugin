@@ -84,6 +84,52 @@ public class EnvDashboardView extends View {
             return "Environment Dashboard";
         }
 
+        public static ArrayList<String> getCustomColumns(){
+            Connection conn = null;
+            Statement stat = null;
+            ArrayList<String> columns;
+            columns = new ArrayList<String>();
+            String queryString="SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='ENV_DASHBOARD';";
+            String[] fields = {"envComp", "compName", "envName", "buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName"};
+            boolean columnFound = false;
+            try {
+                ResultSet rs = null;
+                conn = DBConnection.getConnection();
+
+                try {
+                    assert conn != null;
+                    stat = conn.createStatement();
+                } catch (SQLException e) {
+                    System.out.println("E3" + e.getMessage());
+                }
+                try {
+                    assert stat != null;
+                    rs = stat.executeQuery(queryString);
+                } catch (SQLException e) {
+                    System.out.println("E4" + e.getMessage());
+                }
+                String col = "";
+                while (rs.next()) {
+                    columnFound=false;
+                    col = rs.getString("COLUMN_NAME");
+                    for (String presetColumn : fields){
+                        if (col.toLowerCase().equals(presetColumn.toLowerCase())){
+                            columnFound = true;
+                            break;
+                        }
+                    }
+                    if (!columnFound){
+                        columns.add(col.toLowerCase());
+                    }
+                }
+                DBConnection.closeConnection();
+            } catch (SQLException e) {
+                System.out.println("E11" + e.getMessage());
+                return null;
+            }
+            return columns;
+        }
+
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             envOrder = formData.getString("envOrder");
@@ -245,6 +291,70 @@ public class EnvDashboardView extends View {
             System.out.println("Error executing: " + queryString);
         }
         return deployment;
+    }
+
+    public ArrayList<String> getCustomDBColumns(){
+        return DescriptorImpl.getCustomColumns();
+    }
+
+    public ArrayList<HashMap<String, String>> getDeploymentsByComp(String comp, Integer lastDeploy) {
+        if ( lastDeploy <= 0 ) {
+            lastDeploy = 10;
+        }
+        ArrayList<HashMap<String, String>> deployments;
+        deployments = new ArrayList<HashMap<String, String>>();
+        HashMap<String, String> hash;
+        String[] fields = {"envName", "buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName"};
+        ArrayList<String> allDBFields = getCustomDBColumns();
+        for (String field : fields ){
+            allDBFields.add(field);
+        }
+        String queryString="select top " + lastDeploy + " * from env_dashboard where compName='" + comp + "' order by created_at desc;";
+            try {
+                ResultSet rs = runQuery(queryString);
+                while (rs.next()) {
+                    hash = new HashMap<String, String>();
+                    for (String field : allDBFields) {
+                        hash.put(field, rs.getString(field));
+                    }
+                    deployments.add(hash);
+                }
+                DBConnection.closeConnection();
+            } catch (SQLException e) {
+                System.out.println("E11" + e.getMessage());
+                return null;
+            }
+        return deployments;
+    }
+
+    public ArrayList<HashMap<String, String>> getDeploymentsByCompEnv(String comp, String env, Integer lastDeploy) {
+        if ( lastDeploy <= 0 ) {
+            lastDeploy = 10;
+        }
+        ArrayList<HashMap<String, String>> deployments;
+        deployments = new ArrayList<HashMap<String, String>>();
+        HashMap<String, String> hash;
+        String[] fields = {"envName", "buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName"};
+        ArrayList<String> allDBFields = getCustomDBColumns();
+        for (String field : fields ){
+            allDBFields.add(field);
+        }
+        String queryString="select top " + lastDeploy + " " +  StringUtils.join(allDBFields, ", ").replace(".$","") + " from env_dashboard where compName='" + comp + "' and envName='" + env + "' order by created_at desc;";
+            try {
+                ResultSet rs = runQuery(queryString);
+                while (rs.next()) {
+                    hash = new HashMap<String, String>();
+                    for (String field : allDBFields) {
+                        hash.put(field, rs.getString(field));
+                    }
+                    deployments.add(hash);
+                }
+                DBConnection.closeConnection();
+            } catch (SQLException e) {
+                System.out.println("E11" + e.getMessage());
+                return null;
+            }
+        return deployments;
     }
 
     public HashMap getCompLastDeployed(String env, String comp) {
