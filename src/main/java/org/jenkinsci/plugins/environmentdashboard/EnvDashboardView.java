@@ -361,11 +361,15 @@ public class EnvDashboardView extends View {
         HashMap<String, String> deployment;
         deployment = new HashMap<String, String>();
         String[] fields = {"buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName"};
-        String queryString = "select top 1 " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
+        ArrayList<String> allDBFields = getCustomDBColumns();
+        for (String field : fields ){
+            allDBFields.add(field);
+        }
+        String queryString = "select top 1 " + StringUtils.join(allDBFields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
         try {
             ResultSet rs = runQuery(queryString);
             rs.next();
-            for (String field : fields) {
+            for (String field : allDBFields) {
                 deployment.put(field, rs.getString(field));
             }
             DBConnection.closeConnection();
@@ -418,5 +422,4 @@ public class EnvDashboardView extends View {
     public void onJobRenamed(Item item, String s, String s2) {
 
     }
-
 }
