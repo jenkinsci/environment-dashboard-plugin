@@ -234,11 +234,11 @@
                                             <j:set var="clss" value="deploying"/>
                                             <j:set var="extn" value="console"/>
                                         </j:case>
-                                        <j:case value="UNKNOWN">
+                                        <j:default>
                                             <j:set var="bgcol" value="#eccf97;"/>
                                             <j:set var="clss" value="notused"/>
                                             <j:set var="extn" value="console"/>
-                                        </j:case>
+                                        </j:default>
                                     </j:switch>
 
                                     <td class="${clss}" style="background-color:${bgcol} padding 1.5% 1.5%;" align="center">
