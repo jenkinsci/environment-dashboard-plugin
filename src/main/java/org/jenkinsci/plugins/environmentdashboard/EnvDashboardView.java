@@ -49,6 +49,31 @@ public class EnvDashboardView extends View {
         this.deployHistory = deployHistory;
     }
 
+    static {
+        ensureCorrectDBSchema();
+    }
+
+   private static void ensureCorrectDBSchema(){
+       String returnComment = "";
+       Connection conn = null;
+       Statement stat = null;
+       conn = DBConnection.getConnection();
+       try {
+           assert conn != null;
+           stat = conn.createStatement();
+       } catch (SQLException e) {
+           System.out.println("E13" + e.getMessage());
+       }
+       try {
+           stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS packageName VARCHAR(255);");
+       } catch (SQLException e) {
+           System.out.println("E14: Could not alter table to add package column to table env_dashboard.\n" + e.getMessage());
+       } finally { 
+           DBConnection.closeConnection();
+       }
+       return;
+   }
+
     @Override
     protected void submit(final StaplerRequest req) throws IOException, ServletException, FormException {
         req.bindJSON(this, req.getSubmittedForm());
