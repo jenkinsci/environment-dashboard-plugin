@@ -95,7 +95,7 @@
                                          <table style="width=100%" class="table table-bordered table-striped table-condensed">
                                             <tbody>
                                                 <th style="width: 8%" align="center">Build</th>
-                                                <j:if test="${!compLastDeployed.get('packageName').equals('')}">
+                                                <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
                                                     <th align="center">Package</th>
                                                 </j:if>
                                                 <j:forEach items="${customColumnsList}" var="column">
@@ -112,7 +112,7 @@
                                                         <td >
                                                             <a title="View Deployment" href="${deployment.get('jobUrl')}">${deployment.get('buildNum')}</a>
                                                         </td>
-                                                        <j:if test="${!compLastDeployed.get('packageName').equals('')}">
+                                                        <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
                                                             <td style="word-wrap:break-word">
                                                                 ${deployment.get('packageName')}
                                                             </td>
@@ -163,7 +163,7 @@
                                                 <th align="center">Env</th>
                                                 <th align="center">Build</th>
                                                 <th align="center">Status</th>
-                                                <j:if test="${!compLastDeployed.get('packageName').equals('')}">
+                                                <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
                                                     <th align="center">Package</th>
                                                 </j:if>
                                                 <th align="center">Time</th>
@@ -193,7 +193,7 @@
                                                             </j:default>
                                                         </j:switch>
                                                     </td>
-                                                    <j:if test="${!compLastDeployed.get('packageName').equals('')}">
+                                                    <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
                                                         <td>
                                                             ${deployment.get('packageName')}
                                                         </td>
@@ -239,8 +239,8 @@
                                     <td class="${clss}" style="background-color:${bgcol} padding 1.5% 1.5%;" align="center">
                                         <a style="text-decoration:none; color:blue; font-size:medium;" title="View" href="javascript:toggle('${comps}_${env}_Popup');">
                                             <strong>
-                                                <j:if test="${deployment.get('packageName').equals('')}">${deployment.get('buildNum')}</j:if>
-                                                <j:if test="${!deployment.get('packageName').equals('')}">${deployment.get('packageName')}</j:if>
+                                                <j:if test="${deployment.get('packageName').equals('') || deployment.get('packageName') == null}">${deployment.get('buildNum')}</j:if>
+                                                <j:if test="${!deployment.get('packageName').equals('') &amp;&amp; deployment.get('packageName') != null}">${deployment.get('packageName')}</j:if>
 												<j:switch on="${deployment.get('buildstatus')}">
 													<j:case value="SUCCESS">
                                                         <span title="SUCCESS" style="color:green;"></span>
