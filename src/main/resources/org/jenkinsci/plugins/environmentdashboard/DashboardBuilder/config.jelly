@@ -25,10 +25,10 @@
                     <f:entry>
                         <f:repeatable field="data" var="item" minimum="${1}" items="${descriptor.data}">
                             <table>
-                                <f:entry field="columnName" title="${%columnName}">
+                                <f:entry field="columnName" title="${%Column Name}">
                                     <f:textbox value="${item.columnName}" />
                                 </f:entry>
-                                <f:entry field="contents" title="${%contents}">
+                                <f:entry field="contents" title="${%Contents}">
                                     <f:textbox value="${item.contents}"/>
                                 </f:entry>
                                 <f:entry>
