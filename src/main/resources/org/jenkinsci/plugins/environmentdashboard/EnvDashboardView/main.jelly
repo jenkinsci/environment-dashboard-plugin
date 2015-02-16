@@ -41,7 +41,7 @@
 
                                             <j:set var="hasPackageColumn" value="${false}"/>
                                             <j:forEach items="${it.getDeployments(envsHeader, limitDeploy)}" var="time">
-                                                <j:if test="${it.getCompDeployed(envsHeader,time).get('packageName').equals('')}">
+                                                <j:if test="${it.getCompDeployed(envsHeader,time).get('packageName') != null &amp;&amp; !it.getCompDeployed(envsHeader,time).get('packageName').equals('')}">
                                                     <j:set var="hasPackageColumn" value="${true}"/>
                                                 </j:if>
                                             </j:forEach>
