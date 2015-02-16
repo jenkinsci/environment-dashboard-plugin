@@ -49,6 +49,31 @@ public class EnvDashboardView extends View {
         this.deployHistory = deployHistory;
     }
 
+    static {
+        ensureCorrectDBSchema();
+    }
+
+   private static void ensureCorrectDBSchema(){
+       String returnComment = "";
+       Connection conn = null;
+       Statement stat = null;
+       conn = DBConnection.getConnection();
+       try {
+           assert conn != null;
+           stat = conn.createStatement();
+       } catch (SQLException e) {
+           System.out.println("E13" + e.getMessage());
+       }
+       try {
+           stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS packageName VARCHAR(255);");
+       } catch (SQLException e) {
+           System.out.println("E14: Could not alter table to add package column to table env_dashboard.\n" + e.getMessage());
+       } finally { 
+           DBConnection.closeConnection();
+       }
+       return;
+   }
+
     @Override
     protected void submit(final StaplerRequest req) throws IOException, ServletException, FormException {
         req.bindJSON(this, req.getSubmittedForm());
@@ -361,11 +386,15 @@ public class EnvDashboardView extends View {
         HashMap<String, String> deployment;
         deployment = new HashMap<String, String>();
         String[] fields = {"buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName"};
-        String queryString = "select top 1 " + StringUtils.join(fields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
+        ArrayList<String> allDBFields = getCustomDBColumns();
+        for (String field : fields ){
+            allDBFields.add(field);
+        }
+        String queryString = "select top 1 " + StringUtils.join(allDBFields, ", ").replace(".$","") + " from env_dashboard where envName = '" + env + "' and compName = '" + comp + "' order by created_at desc;";
         try {
             ResultSet rs = runQuery(queryString);
             rs.next();
-            for (String field : fields) {
+            for (String field : allDBFields) {
                 deployment.put(field, rs.getString(field));
             }
             DBConnection.closeConnection();
@@ -418,5 +447,4 @@ public class EnvDashboardView extends View {
     public void onJobRenamed(Item item, String s, String s2) {
 
     }
-
 }
