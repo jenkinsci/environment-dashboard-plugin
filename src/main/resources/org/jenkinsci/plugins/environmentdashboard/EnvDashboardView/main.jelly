@@ -36,8 +36,8 @@
                                      <table class="table table-bordered table-striped table-condensed">
                                         <j:set var="limitDeploy" value="${it.getLimitDeployHistory()}"/>
                                         <tbody>
-                                            <th align="center">Component</th>
-                                            <th align="center">Build</th>
+                                            <th style="text-align:center">Component</th>
+                                            <th style="text-align:center">Build</th>
 
                                             <j:set var="hasPackageColumn" value="${false}"/>
                                             <j:forEach items="${it.getDeployments(envsHeader, limitDeploy)}" var="time">
@@ -46,9 +46,9 @@
                                                 </j:if>
                                             </j:forEach>
                                             <j:if test="${hasPackageColumn}">
-                                                <th align="center">Package</th>
+                                                <th style="text-align:center">Package</th>
                                             </j:if> 
-                                            <th align="center">Last Update</th>
+                                            <th style="text-align:center">Last Update</th>
                                         </tbody>
                                         <j:forEach items="${it.getDeployments(envsHeader, limitDeploy)}" var="time">
                                         <j:set var="deployment" value="${it.getCompDeployed(envsHeader,time)}"/>
@@ -67,7 +67,7 @@
                                                             <span title="RUNNING" style="color:blue;">&#9658;</span>
 														</j:case>
 														<j:default>
-                                                            <span title="UNKNOWN" style="color:blue;">&#63;</span>
+                                                            <span title="UNKNOWN" style="color:orange;">&#63;</span>
 														</j:default>
 													</j:switch>
 												</td>
@@ -94,17 +94,17 @@
                                         <h3>${comp + "   |   " + envsHeader}</h3>
                                          <table style="width=100%" class="table table-bordered table-striped table-condensed">
                                             <tbody>
-                                                <th style="width: 8%" align="center">Build</th>
+                                                <th style="text-align:center; width: 8%">Build</th>
                                                 <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
-                                                    <th align="center">Package</th>
+                                                    <th style="text-align:center">Package</th>
                                                 </j:if>
                                                 <j:forEach items="${customColumnsList}" var="column">
                                                     <j:if test="${compLastDeployed.get(column.toLowerCase()) != null}">
-                                                        <th align="center">${column.substring(0, 1).toUpperCase() + column.substring(1)}</th>
+                                                        <th style="text-align:center">${column.substring(0, 1).toUpperCase() + column.substring(1)}</th>
                                                     </j:if>
                                                 </j:forEach>
-                                                <th align="center" style="width:8%">Status</th>
-                                                <th align="center">Time</th>
+                                                <th style="text-align:center" style="width:8%">Status</th>
+                                                <th style="text-align:center">Time</th>
                                             </tbody>
                                             
                                             <j:forEach items="${it.getDeploymentsByCompEnv(comp, envsHeader, limitDeploy)}" var="deployment">
@@ -136,7 +136,7 @@
                                                                     <span title="RUNNING" style="color:blue;">&#9658;</span>
                                                                 </j:case>
                                                                 <j:default>
-                                                                    <span title="UNKNOWN" style="color:blue;">&#63;</span>
+                                                                    <span title="UNKNOWN" style="color:orange;">&#63;</span>
                                                                 </j:default>
                                                             </j:switch>
                                                         </td>
@@ -160,13 +160,13 @@
                                         <h3>${comp} History</h3>
                                          <table class="table table-bordered table-striped table-condensed">
                                             <tbody>
-                                                <th align="center">Env</th>
-                                                <th align="center">Build</th>
-                                                <th align="center">Status</th>
+                                                <th style="text-align:center">Env</th>
+                                                <th style="text-align:center">Build</th>
+                                                <th style="text-align:center">Status</th>
                                                 <j:if test="${compLastDeployed.get('packageName') != null &amp;&amp; !compLastDeployed.get('packageName').equals('')}">
-                                                    <th align="center">Package</th>
+                                                    <th style="text-align:center">Package</th>
                                                 </j:if>
-                                                <th align="center">Time</th>
+                                                <th style="text-align:center">Time</th>
                                             </tbody>
                                             
                                             <j:forEach items="${it.getDeploymentsByComp(comp, limitDeploy)}" var="deployment">
@@ -189,7 +189,7 @@
                                                                 <span title="RUNNING" style="color:blue;">&#9658;</span>
                                                             </j:case>
                                                             <j:default>
-                                                                <span title="UNKNOWN" style="color:blue;">&#63;</span>
+                                                                <span title="UNKNOWN" style="color:orange;">&#63;</span>
                                                             </j:default>
                                                         </j:switch>
                                                     </td>
@@ -214,7 +214,7 @@
                     <!-- Main dashboard -->
                     <j:forEach items="${orderOfComps}" var="comps">
                         <tr>
-                            <td align="center"><strong><a href="javascript:toggle('${comps}_History')">${comps}</a></strong></td>
+                            <td style="text-align:center"><strong><a href="javascript:toggle('${comps}_History')">${comps}</a></strong></td>
                             <j:forEach items="${orderOfEnvs}" var="env">
                                 <j:set var="deployment" value="${it.getCompLastDeployed(env, comps)}"/>
                                 <j:if test="${!deployment.isEmpty()}">
@@ -234,9 +234,14 @@
                                             <j:set var="clss" value="deploying"/>
                                             <j:set var="extn" value="console"/>
                                         </j:case>
+                                        <j:case value="UNKNOWN">
+                                            <j:set var="bgcol" value="#eccf97;"/>
+                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="extn" value="console"/>
+                                        </j:case>
                                     </j:switch>
 
-                                    <td class="${clss}" style="background-color:${bgcol} padding 1.5% 1.5%;" align="center">
+                                    <td class="${clss}" style="background-color:${bgcol} padding 1.5% 1.5%; text-align:center">
                                         <a style="text-decoration:none; color:blue; font-size:medium;" title="View" href="javascript:toggle('${comps}_${env}_Popup');">
                                             <strong>
                                                 <j:if test="${deployment.get('packageName').equals('') || deployment.get('packageName') == null}">${deployment.get('buildNum')}</j:if>
@@ -252,7 +257,7 @@
                                                         <span title="RUNNING" style="color:blue;">&#9658;</span>
 													</j:case>
 													<j:default>
-                                                        <span title="UNKNOWN" style="color:blue;">&#63;</span>
+                                                        <span title="UNKNOWN" style="color:orange;">&#63;</span>
 													</j:default>
 												</j:switch>
 											</strong>
