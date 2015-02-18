@@ -309,8 +309,6 @@
                             }
 
                         }
-                        var table = document.getElementById("main-panel");
-                        table.width = "100%";
                     </script>
                 </j:case>
             </j:switch>

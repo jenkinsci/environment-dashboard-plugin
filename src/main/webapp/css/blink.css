@@ -20,3 +20,5 @@
   -o-animation:      deploying 2s infinite; /* Opera 12+ */
   animation:         deploying 2s infinite; /* IE 10+ */
 }
+
+#side-panel { display: none;}
