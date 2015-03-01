@@ -37,7 +37,7 @@ public class DBConnection {
         // Generate connection String for DB driver.
         String dbConnectionString = "jdbc:h2:"
                 + Jenkins.getInstance().root.toString() + File.separator
-                + "jenkins_dashboard";
+                + "jenkins_dashboard" + ";MVCC=true";
 
         // Load driver and connect to DB
         try {
