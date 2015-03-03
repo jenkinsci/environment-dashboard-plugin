@@ -13,17 +13,17 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
-import org.jenkinsci.plugins.environmentdashboard.dao.DashboardDAO;
-import org.jenkinsci.plugins.environmentdashboard.entity.Build;
 import org.jenkinsci.plugins.environmentdashboard.utils.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -162,40 +162,38 @@ public class DashboardBuilder extends BuildWrapper {
             return returnComment;
         }
 
-        
-        // 1. Create table of not exists
-        // 2. Alter table if old.
-        // 3. Add Column
-        // 4.
-        
-        DashboardDAO dashboardDAO = new DashboardDAO();
-        
-        try {
-            dashboardDAO.createDashboardTable();
-        } catch (SQLException e) {
-            return "WARN: Could not create table env_dashboard.";
-        }
-        
-        try {
-            dashboardDAO.addColumn("packageName VARCHAR(255)");
-        } catch (SQLException e) {
-            return "WARN: Could not alter table env_dashboard." + e.getErrorCode() + " " + e.getMessage();
-        }
-        
         //Get DB connection
         Connection conn = DBConnection.getConnection();
 
         Statement stat = null;
-
+        try {
+            stat = conn.createStatement();
+        } catch (SQLException e) {
+            returnComment = "WARN: Could not execute statement.";
+            return returnComment;
+        }
+        try {
+            stat.execute("CREATE TABLE IF NOT EXISTS env_dashboard (envComp VARCHAR(255), jobUrl VARCHAR(255), buildNum VARCHAR(255), buildStatus VARCHAR(255), envName VARCHAR(255), compName VARCHAR(255), created_at TIMESTAMP,  buildJobUrl VARCHAR(255), packageName VARCHAR(255));");
+        } catch (SQLException e) {
+            returnComment = "WARN: Could not create table env_dashboard.";
+            return returnComment;
+        }
+        try {
+            stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS packageName VARCHAR(255);");
+        } catch (SQLException e) {
+            returnComment = "WARN: Could not alter table env_dashboard.";
+            return returnComment;
+        }
         String columns = "";
         String contents = "";
         for (ListItem item : passedColumnData){
             columns = columns + ", " +  item.columnName;
             contents = contents + "', '" + item.contents;
             try {
-                dashboardDAO.addColumn(item.columnName + " VARCHAR");
+                stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS " + item.columnName + " VARCHAR;");
             } catch (SQLException e) {
-                return "WARN: Could not alter table env_dashboard to add column " + item.columnName + ".";
+                returnComment = "WARN: Could not alter table env_dashboard to add column " + item.columnName + ".";
+                return returnComment;
             }
         }
         String indexValueofTable = envName + '=' + compName;
@@ -218,29 +216,41 @@ public class DashboardBuilder extends BuildWrapper {
         } else {
             buildJobUrl = "job/" + buildJob + "/" + currentBuildNum;
         }
-        
-        /* Object represents a environment dashboard Jenkins build */
-        Build b = new Build(currentBuildNum,currentBuildUrl,currentBuildResult,envName,compName,buildJobUrl,packageName + contents);
 
-        try {
-            if (runTime.equals("PRE")) {
-                dashboardDAO.addBuild(indexValueofTable, b);
-            } else if(runTime.equals("POST")) {
-               dashboardDAO.updateBuild(indexValueofTable, b);
-            } else if (runTime.equals("NODEPLOY")){
-                dashboardDAO.deleteBuild(indexValueofTable, b);
+        String runQuery = null;
+        if (runTime.equals("PRE")) {
+            runQuery = "INSERT INTO env_dashboard (envComp, jobUrl, buildNum, buildStatus, envName, compName, created_at, buildJobUrl, packageName" + columns +") VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum + "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '" + buildJobUrl + "' , '" + packageName + contents + "');";
+        } else {
+            if (runTime.equals("POST")) {
+                runQuery = "UPDATE env_dashboard SET buildStatus = '" + currentBuildResult + "', created_at = current_timestamp WHERE envComp = '" + indexValueofTable +"' AND joburl = '" + currentBuildUrl + "';";
+            }else {
+                if (runTime.equals("NODEPLOY")){
+                    runQuery = "DELETE FROM env_dashboard where envComp = '" + indexValueofTable +"' AND joburl = '" + currentBuildUrl + "';";
+                }
             }
-        } catch (SQLException e) {
-          return "Error running query!" + e.getMessage().toString();
         }
-        
-
         try {
-            dashboardDAO.deleteBuilds(numberOfDays);
+            stat.execute(runQuery);
         } catch (SQLException e) {
-                return "Error running delete query!" + e.getMessage().toString();
+            returnComment = "Error running query " + runQuery + ".";
+            return returnComment;
         }
-        
+        if ( numberOfDays > 0 ) {
+            runQuery = "DELETE FROM env_dashboard where created_at <= current_timestamp - " + numberOfDays;
+            try {
+                stat.execute(runQuery);
+            } catch (SQLException e) {
+                returnComment = "Error running delete query " + runQuery + ".";
+                return returnComment;
+            }
+        }
+        try {
+            stat.close();
+            conn.close();
+        } catch (SQLException e) {
+            returnComment = "Error closing connection.";
+            return returnComment;
+        }
         return "Updated Dashboard DB";
     }
 
