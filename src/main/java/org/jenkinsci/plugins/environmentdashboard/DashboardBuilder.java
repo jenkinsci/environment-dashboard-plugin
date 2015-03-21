@@ -56,6 +56,7 @@ public class DashboardBuilder extends BuildWrapper {
         }else {
             this.addColumns=false;
         }
+        //this.data = Collections.emptyList();
         if(this.addColumns){
             for (ListItem i: data){
                 if(!i.getColumnName().isEmpty()){ 
