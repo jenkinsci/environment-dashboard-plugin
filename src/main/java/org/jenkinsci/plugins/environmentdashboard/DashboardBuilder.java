@@ -41,11 +41,11 @@ public class DashboardBuilder extends BuildWrapper {
     private final String buildNumber;
     private final String buildJob;
     private final String packageName;
-    private List<ListItem> data = Collections.emptyList();
+    private ArrayList<ListItem> data = new ArrayList<ListItem>();
     public boolean addColumns = false;
 
     @DataBoundConstructor
-    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName, boolean addColumns, List<ListItem> data) {
+    public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob, String packageName, boolean addColumns, ArrayList<ListItem> data) {
         this.nameOfEnv = nameOfEnv;
         this.componentName = componentName;
         this.buildNumber = buildNumber;
@@ -56,10 +56,13 @@ public class DashboardBuilder extends BuildWrapper {
         }else {
             this.addColumns=false;
         }
+        //this.data = Collections.emptyList();
         if(this.addColumns){
-            this.data = data;
-        }else{
-            this.data = Collections.emptyList();
+            for (ListItem i: data){
+                if(!i.getColumnName().isEmpty()){ 
+                    this.data.add(i);
+                }
+            }
         }
     }
 
