@@ -10,6 +10,7 @@ public class ListItem extends AbstractDescribableImpl<ListItem> {
     public String columnName;
     public String contents;
 
+	
     @DataBoundConstructor
     public ListItem(String columnName, String contents){
         this.columnName = columnName;
