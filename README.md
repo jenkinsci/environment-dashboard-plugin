@@ -44,7 +44,7 @@ Other information:
 Configuration
 =============
 
-After installing the plugin, you'll get a new option in the Build Environment section of a job configuration page.  If your job deploys to an environment, check the box and complete the form using the context sensitive help.
+After installing the plugin, you'll get a new option in the Build Environment section of a job configuration page. If your job deploys to an environment, check the box and complete the form using the context sensitive help.
 
 You can also specify how long to retain the dashboard data, the default is set to 30 days. Any data older than 30 days from the current time is automatically deleted.
 
