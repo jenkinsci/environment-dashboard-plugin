@@ -20,9 +20,9 @@ You have 3 software components:
 * Web Application and API
 * Database
 
-Each component has a corresponding Jenkins "build and package" job that creates new environment agnostic build packages and puts the code into something like Nexus waiting for someone to pick it up and deploy it.
+Each component has a corresponding Jenkins "build and package" job that creates new environment-agnostic build packages and puts the code into something like Nexus waiting for someone to pick it up and deploy it.
 
-You have 4 environments
+You have 4 environments:
 * CI Test
 * Performance Test
 * Pre-production
