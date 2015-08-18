@@ -1,18 +1,26 @@
 @-webkit-keyframes deploying {
-  from { background-color: #3498db; }
-  to { background-color: inherit; }
+  from { background-color: #2F89C5; 
+          color: white; }
+  to { background-color: #9ACCED;
+          color: white;  }
 }
 @-moz-keyframes deploying {
-  from { background-color: #3498db; }
-  to { background-color: inherit; }
+  from { background-color: #2F89C5; 
+          color: white; }
+  to { background-color: #9ACCED;
+          color: white;  }
 }
 @-o-keyframes deploying {
-  from { background-color: #3498db; }
-  to { background-color: inherit; }
+  from { background-color: #2F89C5; 
+          color: white; }
+  to { background-color: #9ACCED;
+          color: white;  }
 }
 @keyframes deploying {
-  from { background-color: #3498db; }
-  to { background-color: inherit; }
+  from { background-color: #2F89C5; 
+          color: white; }
+  to { background-color: #9ACCED;
+          color: white;  }
 }
 .deploying {
   -webkit-animation: deploying 2s infinite; /* Safari 4+ */

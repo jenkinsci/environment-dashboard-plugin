@@ -1,0 +1,82 @@
+.tableDiv{
+  display: table;
+  border-collapse: separate;
+  border-spacing: 10px;
+}
+.row {
+  display: table-row;
+}
+.cellEmpty{
+    display: table-cell;
+    width: 16em;
+}
+.cell {
+    display: table-cell;
+    width: 20%;
+    padding: 1em 2em;
+    background: #f6c75d;
+    border: 4px solid #de9542;
+    border-radius: 25px; /* Standard */
+    -o-border-radius: 25px; /* Opera 10.x */
+    -moz-border-radius: 25px; /* Mozilla/Firefox */
+    -icab-border-radius: 25px; /* iCab */
+    -khtml-border-radius: 25px; /* KHTML/Konqueror */
+    -webkit-border-radius: 25px; /* Webkit/Safari/Chrome/etcetera */
+    vertical-align: middle;
+}
+
+.cell.jobResult.success {
+	background-color: #009900;
+	border-color: #004C00;
+	color:white;
+}
+.cell.jobResult.failure {
+	background-color: #E60000;
+	border-color: #800000;
+	color:white;
+}
+.cell.jobResult.none {
+	background-color: #B2B2B2;
+	border-color: #666666;
+	color:black;
+}
+.cell.jobResult a.packageName {
+	color: inherit;
+	text-decoration:none;
+	font-size:medium;
+}
+a.buildDate {
+	font-size:small; 
+	text-decoration:none;
+	color: antiquewhite;
+}
+.cell.deploying {
+	border-color: #246A99;
+}
+
+div.cell.envHeader, div.cell.componentHeader {
+	text-align:center;
+	background-color: #389B9B;
+	border-color: #256767;
+}
+div.cell.envHeader a.envHeaderLink {
+	text-decoration:none;
+	font-size: larger;
+	text-transform: uppercase;
+	color: white;
+	font-weight: bold;
+}
+div.cell.envHeader a:hover, div.cell.componentHeader a:hover {
+	color: #B2B2B2;
+}
+
+div.cell.componentHeader a.compHeaderLink{
+	font-size: larger;
+	text-decoration: none;
+	color: white;
+	font-weight: bold;
+}
+td, tr {
+	margin: 0.25em;
+}
+

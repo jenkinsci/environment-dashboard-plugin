@@ -3,31 +3,31 @@
 <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
 <link href="${rootURL}/plugin/environment-dashboard/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet"/>
 <link href="${rootURL}/plugin/environment-dashboard/css/blink.css" type="text/css" rel="stylesheet"/>
+<link href="${rootURL}/plugin/environment-dashboard/css/main.css" type="text/css" rel="stylesheet"/>
 <div class="overlay" style="display:none; background-color: rgba(0, 0, 0, 0.4); position:absolute; top: 0; left:0; bottom:0; right:0;" onclick="hideAll()"></div>
 <div class="popup" id="popup" style="position: absolute; width: 300px; height:150; display:none; background-color: white; text-align: center; top:50%; left:50%; margin-left: -150px; margin-top: -75;"></div>
 <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-<div id="startDashboard">
-    <table id="envDashboard" class="table table-bordered table-striped table-condensed">
-        <tbody>
+<div id="startDashboard" class="tableDiv">
+    
             <j:switch on="${it.anyJobsConfigured()}">
                 <j:case value="NONE">
-                    <tr>
+                    
                         <div class="jumbotron">
                             <h2>Hi, there!</h2>
                             <p>You possibly haven't set up any jobs to use the Dashboard. Or if you have, the job hasn't run atleast once. You can configure the jobs by using the 'Details for Environment Dashboard' checkbox.</p>
                         </div>
-                    </tr>
+                    
                 </j:case>
                 <j:case value="ENVS">
-                    <tr align="center">
-                        <th/>
+                    <div class="row">
+                        <div class="cellEmpty"> </div>
                         <j:set var="orderOfEnvs" value="${it.getOrderOfEnvs()}"/>
                         <j:set var="orderOfComps" value="${it.getOrderOfComps()}"/>
                         <j:set var="customColumnsList" value="${it.getCustomDBColumns()}"/>
 
                         <j:forEach items="${orderOfEnvs}" var="envsHeader">
-                            <th style="text-align:center">
-                                <a style="text-decoration:none" title="View environment history" id="${envsHeader}_Header" href="javascript:toggle('${envsHeader}_History');">${envsHeader}</a>
+                            <div class="cell envHeader">
+                                <a class="envHeaderLink" title="View environment history" id="${envsHeader}_Header" href="javascript:toggle('${envsHeader}_History');">${envsHeader}</a>
                                 <div id="${envsHeader}_History" style="display: inline-block; position: fixed; top: 100; bottom: 100; left: 0; right: 0; width: 900px; height: 600px; position:fixed; margin: auto; padding: 10px; background-color: #FEFEFE; border: 1px solid; border-color: #DDDDDD; box-shadow: 1px 2px 1px #AAAAAA; border-radius: 15px; display:none; overflow: auto; overflow-x:hidden;">
                                     <div align="right">
                                         <b onclick="javascript:hideAll()" style="cursor: pointer">[X]</b>
@@ -206,76 +206,63 @@
                                         </table>
                                     </div>
                                 </j:forEach>
-                            </th>
+                            </div>
                         </j:forEach>
-                    </tr>
+                    </div>
 
 
                     <!-- Main dashboard -->
                     <j:forEach items="${orderOfComps}" var="comps">
-                        <tr>
-                            <td align="center"><strong><a href="javascript:toggle('${comps}_History')">${comps}</a></strong></td>
+                        <div class="row">
+                            <div class="cell componentHeader"><a class="compHeaderLink" href="javascript:toggle('${comps}_History')">${comps}</a></div>
                             <j:forEach items="${orderOfEnvs}" var="env">
                                 <j:set var="deployment" value="${it.getCompLastDeployed(env, comps)}"/>
                                 <j:if test="${!deployment.isEmpty()}">
                                     <j:switch on="${deployment.get('buildstatus')}">
                                         <j:case value="SUCCESS">
                                             <j:set var="bgcol" value="#DAF5DA;"/>
-                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="clss" value="jobResult success"/>
                                             <j:set var="extn" value=""/>
                                         </j:case>
                                         <j:case value="FAILURE">
                                             <j:set var="bgcol" value="#FF6666;"/>
-                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="clss" value="jobResult failure"/>
                                             <j:set var="extn" value=""/>
                                         </j:case>
                                         <j:case value="RUNNING">
                                             <j:set var="bgcol" value="#ffffff;"/>
-                                            <j:set var="clss" value="deploying"/>
+                                            <j:set var="clss" value="jobResult deploying"/>
                                             <j:set var="extn" value="console"/>
                                         </j:case>
                                         <j:default>
                                             <j:set var="bgcol" value="#eccf97;"/>
-                                            <j:set var="clss" value="notused"/>
+                                            <j:set var="clss" value="jobResult None"/>
                                             <j:set var="extn" value="console"/>
                                         </j:default>
                                     </j:switch>
 
-                                    <td class="${clss}" style="background-color:${bgcol} padding 1.5% 1.5%;" align="center">
-                                        <a style="text-decoration:none; color:blue; font-size:medium;" title="View" href="javascript:toggle('${comps}_${env}_Popup');">
+                                    <div class="cell ${clss}" align="center" title="${deployment}">
+                                        <a class="packageName" title="View" href="javascript:toggle('${comps}_${env}_Popup');">
                                             <strong>
                                                 <j:if test="${deployment.get('packageName').equals('') || deployment.get('packageName') == null}">${deployment.get('buildNum')}</j:if>
                                                 <j:if test="${!deployment.get('packageName').equals('') &amp;&amp; deployment.get('packageName') != null}">${deployment.get('packageName')}</j:if>
-												<j:switch on="${deployment.get('buildstatus')}">
-													<j:case value="SUCCESS">
-                                                        <span title="SUCCESS" style="color:green;">&#10004;</span>
-													</j:case>
-													<j:case value="FAILURE">
-                                                        <span title="FAILURE" style="color:darkred;">&#x2716;</span>
-													</j:case>
-													<j:case value="RUNNING">
-                                                        <span title="RUNNING" style="color:blue;">&#9658;</span>
-													</j:case>
-													<j:default>
-                                                        <span title="UNKNOWN" style="color:orange;">&#63;</span>
-													</j:default>
-												</j:switch>
+									
 											</strong>
                                         </a>
                                         <div align="right">
                                             <code>
-                                                <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${deployment.get('jobUrl')}${extn}">[${it.getNiceTimeStamp(deployment.get('created_at'))}]</a>
+                                                <a class="buildDate" title="View Deployment" href="${deployment.get('jobUrl')}${extn}">[${it.getNiceTimeStamp(deployment.get('created_at'))}]</a>
                                             </code>
                                         </div>
-                                    </td>
+                                    </div>
                                 </j:if>
                                 <j:if test="${deployment.isEmpty()}">
-                                    <td>
-                                        <div align="center" style="font-size:15px;"><strong>---</strong></div>
-                                    </td>
+                                    <div class="cell jobResult none">
+                                        <div align="center" style="font-size:15px;"><strong>N/A</strong></div>
+                                    </div>
                                 </j:if>
                             </j:forEach>
-                        </tr>
+                        </div>
                     </j:forEach>
 
                     <script language="javascript">
@@ -312,7 +299,6 @@
                     </script>
                 </j:case>
             </j:switch>
-        </tbody>
-    </table>
+
 </div>
 </j:jelly>

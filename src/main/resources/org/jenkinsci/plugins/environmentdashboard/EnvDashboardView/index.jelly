@@ -1,8 +1,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
     <l:layout>
         <l:main-panel>
-            <p align="right"><a href="configure">Configure</a><st:nbsp/><st:nbsp/><st:nbsp/><a href="delete">Delete</a></p><br /><br />
             <st:include page="main.jelly"/>
+            <p align="right"><a href="configure">Configure</a><st:nbsp/><st:nbsp/><st:nbsp/><a href="delete">Delete</a></p>
         </l:main-panel>
     </l:layout>
 </j:jelly>
