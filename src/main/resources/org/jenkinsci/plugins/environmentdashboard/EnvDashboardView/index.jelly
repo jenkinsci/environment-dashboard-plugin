@@ -1,8 +1,17 @@
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
     <l:layout>
         <l:main-panel>
             <p align="right"><a href="configure">Configure</a><st:nbsp/><st:nbsp/><st:nbsp/><a href="delete">Delete</a></p><br /><br />
             <st:include page="main.jelly"/>
+            <j:if test="${h.hasPermission(app.ADMINISTER)}">
+                <f:form name="purge" method="post" action="purgeSubmit" tableClass="advancedLink">
+                    <f:advanced title="${%Dangerous Operation}">
+                        <f:entry>
+                            <input type="submit" name="Submit" value="${%Purge All}" class="submit-button danger" />
+                        </f:entry>
+                    </f:advanced>
+                </f:form>
+            </j:if>
         </l:main-panel>
     </l:layout>
 </j:jelly>
