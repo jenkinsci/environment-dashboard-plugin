@@ -19,7 +19,7 @@ You have 3 software components:
 * UI
 * Web Application and API
 * Database
-
+* Changed by Felix Rante
 Each component has a corresponding Jenkins "build and package" job that creates new environment agnostic build packages and puts the code into something like Nexus waiting for someone to pick it up and deploy it.
 
 You have 4 environments
