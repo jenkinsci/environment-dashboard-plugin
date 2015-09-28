@@ -5,15 +5,14 @@ This Jenkins plugin creates a custom view which can be used as a dashboard to di
 
 ![JobConfig](https://github.com/vipinsthename/environment-dashboard/raw/master/img/config.png)
 
-![Configuration](https://github.com/vipinsthename/environment-dashboard/raw/master/img/dashboard_config.png)
+![Configuration](https://github.coadsasda sdasd am/vipinsthename/environment-dashboard/raw/master/img/dashboard_config.png)
 
 ![Dashboard](https://github.com/vipinsthename/environment-dashboard/raw/master/img/dashboard.png)
 
 Click on the Environment name to get a historical view of the deployments.
 
 ![Dashboard history](https://github.com/vipinsthename/environment-dashboard/raw/master/img/dashboard_history.png)
-
-## Example set up ##
+sdasdasd
 
 You have 3 software components:
 * UI
@@ -23,7 +22,7 @@ You have 3 software components:
 Each component has a corresponding Jenkins "build and package" job that creates new environment agnostic build packages and puts the code into something like Nexus waiting for someone to pick it up and deploy it.
 
 You have 4 environments
-* CI Test
+* CI Testasd
 * Performance Test
 * Pre-production
 * Production
