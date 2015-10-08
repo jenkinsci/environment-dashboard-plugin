@@ -34,7 +34,7 @@ You find it hard to track which version of each application is currently deploye
 
 You configure your deployment jobs to publish a record of each deployment to this plugin.
 
-You create a view which displays a matrix with rows for your 3 applications, columns for your environments and the intersections with the deployed code version.
+You will now create a view which displays a matrix with rows for your 3 applications, columns for your environments and the intersections with the deployed code version.
 
 Other information:
 * Bug Tracker for known issues and expectations : [Jenkins Build Flow Component](https://issues.jenkins-ci.org/browse/JENKINS/component/TBC)
