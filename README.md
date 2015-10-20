@@ -15,7 +15,7 @@ Click on the Environment name to get a historical view of the deployments.
 
 ## Example set up ##
 
-You have 3 software components:
+You have three software components:
 * UI
 * Web Application and API
 * Database
