@@ -28,7 +28,7 @@ You have 4 environments
 * Pre-production
 * Production
 
-You have Jenkins jobs for deploying build packages to your environments.
+You have Jenkins jobs for deploying build packages to your environments.I have made a change here. 
 
 You find it hard to track which version of each application is currently deployed to.
 
