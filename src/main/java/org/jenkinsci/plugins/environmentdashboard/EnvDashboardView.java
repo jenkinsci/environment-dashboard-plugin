@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +31,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 /**
  * Class to provide build wrapper for Dashboard.
@@ -80,6 +82,25 @@ public class EnvDashboardView extends View {
     @Override
     protected void submit(final StaplerRequest req) throws IOException, ServletException, FormException {
         req.bindJSON(this, req.getSubmittedForm());
+    }
+
+    @RequirePOST
+    public void doPurgeSubmit(final StaplerRequest req, StaplerResponse res) throws IOException, ServletException, FormException {
+        checkPermission(Jenkins.ADMINISTER);
+
+        Connection conn = null;
+        Statement stat = null;
+        conn = DBConnection.getConnection();
+        try {
+            assert conn != null;
+            stat = conn.createStatement();
+            stat.execute("TRUNCATE TABLE env_dashboard");
+        } catch (SQLException e) {
+            System.out.println("E15: Could not truncate table env_dashboard.\n" + e.getMessage());
+        } finally { 
+            DBConnection.closeConnection();
+        }
+        res.forwardToPreviousPage(req);
     }
 
     @Override

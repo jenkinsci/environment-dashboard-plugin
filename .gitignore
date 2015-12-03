@@ -84,6 +84,7 @@ $RECYCLE.BIN/
 
 #Maven
 target/
+settings.xml
 
 #Jenkins
 work/
