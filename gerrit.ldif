@@ -1,0 +1,9 @@
+dn: cn=gerrit,ou=people,dc=adop,dc=accenture,dc=com
+objectClass: inetOrgPerson
+cn: gerrit
+sn: gerrit
+displayName: gerrit
+givenName: gerrit
+mail: gerrit@accenture.com
+uid: gerrit
+userPassword:gerrit
