@@ -7,34 +7,34 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 public class ListItem extends AbstractDescribableImpl<ListItem> {
 
-    public String columnName;
-    public String contents;
+	public String columnName;
+	public String contents;
 
-    @DataBoundConstructor
-    public ListItem(String columnName, String contents){
-        this.columnName = columnName;
-        this.contents = contents;
-    }
+	@DataBoundConstructor
+	public ListItem(String columnName, String contents) {
+		this.columnName = columnName;
+		this.contents = contents;
+	}
 
-    public String getColumnName(){
-        return columnName;
-    }
+	public String getColumnName() {
+		return columnName;
+	}
 
-    public String getContents(){
-        return contents;
-    }
+	public String getContents() {
+		return contents;
+	}
 
-    @Override
-    public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl)super.getDescriptor();
-    }
+	@Override
+	public DescriptorImpl getDescriptor() {
+		return (DescriptorImpl) super.getDescriptor();
+	}
 
-    @Extension
-    public static class DescriptorImpl extends Descriptor<ListItem>{
-        @Override
-        public String getDisplayName(){
-            return "";
-        }
-    }
+	@Extension
+	public static class DescriptorImpl extends Descriptor<ListItem> {
+		@Override
+		public String getDisplayName() {
+			return "";
+		}
+	}
 
 }
