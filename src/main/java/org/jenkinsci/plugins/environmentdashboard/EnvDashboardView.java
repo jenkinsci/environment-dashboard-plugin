@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -476,7 +477,7 @@ public class EnvDashboardView extends View {
 
     @Override
     public Collection<TopLevelItem> getItems() {
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     public String getEnvOrder() {
