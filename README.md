@@ -69,7 +69,7 @@ The groovy DSL can be used in conjunction with Job DSL plugin to provide a defin
 
 Examples
 
-'''groovy
+```groovy
 job('example-1') {
     wrappers {
         environmentDashboard {
@@ -93,4 +93,4 @@ job('example-2') {
           }
         }
 }
-'''
+```
