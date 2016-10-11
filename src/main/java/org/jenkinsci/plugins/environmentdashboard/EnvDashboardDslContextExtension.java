@@ -35,7 +35,7 @@ public class EnvDashboardDslContextExtension extends ContextExtensionPoint {
     }
 
     /**
-     * DSL extension method to handle non-existent closure environment dashboard wrapper context.
+     * DSL extension method to handle non-existent closure for environment dashboard wrapper context.
      * @return
      *
      * Example:
