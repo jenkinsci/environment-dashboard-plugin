@@ -49,3 +49,48 @@ After installing the plugin, you'll get a new option in the Build Environment se
 You can also specify how long you want to retain the dashboard data, the default is set to 30 days. Any data older than 30 days from the current time is automatically deleted.
 
 Once you have run at least one job with a populated Details for Environment dashboard section, you now have enough data to generate a dashboard.  On the Jenkins home page, click the + to create a new view and create a view.  If you leave all settings blank, you will see the deployments of all components into all environments. You can also limit the deployment history shown when you click on the environment name on the dashboard. The default is last 10 deploys.
+
+
+## Job DSL ##
+
+'''groovy
+environmentDashboard {
+    environmentName(String environmentName)
+    componentName(String componentName)
+    buildNumber(String buildNumber)
+    buildJob(String buildJob)
+    packageName(String packageName)
+    addColumns(boolean addColumns)
+    columns(String columnName, String contents)
+}
+'''
+
+The groovy DSL can be used in conjunction with Job DSL plugin to provide a definition of environment dashboard section within a job.
+
+Examples
+
+'''groovy
+job('example-1') {
+    wrappers {
+        environmentDashboard {
+            environmentName('Environment-1')
+            componentName('WebApp-1')
+            buildNumber('Version-1')
+          }
+        }
+}
+
+// Add custom columns
+job('example-2') {
+    wrappers {
+        environmentDashboard {
+            environmentName('Environment-1')
+            componentName('WebApp-1')
+            buildNumber('Version-1')
+            addColumns(true)
+            column('Col1', 'Column 1 contents')
+            column('Col2', 'Column 2 contents')
+          }
+        }
+}
+'''

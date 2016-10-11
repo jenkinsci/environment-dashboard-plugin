@@ -29,6 +29,7 @@ local.properties
 .idea/
 *.iml
 *.iws
+*.ipr
 
 # External tool builders
 .externalToolBuilders/
