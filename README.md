@@ -53,7 +53,7 @@ Once you have run at least one job with a populated Details for Environment dash
 
 ## Job DSL ##
 
-'''groovy
+```groovy
 environmentDashboard {
     environmentName(String environmentName)
     componentName(String componentName)
@@ -63,7 +63,7 @@ environmentDashboard {
     addColumns(boolean addColumns)
     columns(String columnName, String contents)
 }
-'''
+```
 
 The groovy DSL can be used in conjunction with Job DSL plugin to provide a definition of environment dashboard section within a job.
 
