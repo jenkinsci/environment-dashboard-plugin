@@ -1,14 +1,10 @@
 package org.jenkinsci.plugins.environmentdashboard;
 
 import javaposse.jobdsl.dsl.Context;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-/*
-Environment Dashboard DSL Context
+/**
+ * Environment Dashboard DSL Context
  */
 public class EnvDashboardDslContext implements Context {
     String nameOfEnv = "";

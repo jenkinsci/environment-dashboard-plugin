@@ -5,21 +5,26 @@ import javaposse.jobdsl.dsl.helpers.wrapper.WrapperContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 
+/**
+ * Environment Dashboard DSL context extension class
+ */
 @Extension(optional = true)
 public class EnvDashboardDslContextExtension extends ContextExtensionPoint {
 
-    /*
-    DSL extension method to handle the nested/empty environment dashboard wrapper context.
-
-    Example 1: Nested context
-    environmentDashboard {
-      nameOfEnv('EnvA')
-      componentName('ComponentB')
-      buildNumber('1')
-    }
-
-    Example 2: Empty context
-    environmentDashboard {}
+    /**
+     * DSL extension method to handle the nested/empty environment dashboard wrapper context.
+     * @param closure
+     * @return
+     *
+     * Example 1: Nested context
+     * environmentDashboard {
+     *     environmentName('Environment-1')
+     *     componentName('WebApp-1')
+     *     buildNumber('Version-1')
+     * }
+     *
+     * Example 2: Empty context
+     * environmentDashboard {}
      */
     @DslExtensionMethod(context = WrapperContext.class)
     public Object environmentDashboard(Runnable closure) {
@@ -29,11 +34,12 @@ public class EnvDashboardDslContextExtension extends ContextExtensionPoint {
                 context.buildJob, context.packageName, context.addColumns, context.data);
     }
 
-    /*
-    DSL extension method to handle non-existent closure environment dashboard wrapper context.
-
-    Example:
-    environmentDashboard()
+    /**
+     * DSL extension method to handle non-existent closure environment dashboard wrapper context.
+     * @return
+     *
+     * Example:
+     * environmentDashboard()
      */
     @DslExtensionMethod(context = WrapperContext.class)
     public Object environmentDashboard() {
