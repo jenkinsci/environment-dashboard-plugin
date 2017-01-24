@@ -25,6 +25,12 @@
           <artifactId>jquery</artifactId>
           <version>1.7.2-1</version>
       </dependency>
+      <dependency>
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>job-dsl</artifactId>
+          <version>1.39</version>
+          <optional>true</optional>
+      </dependency>
   </dependencies>
 
   <licenses>
