@@ -32,8 +32,8 @@ import org.kohsuke.stapler.StaplerRequest;
 /**
  * Class to create Dashboard view.
  * 
- * @author vipin
- * @date 15/10/2014
+ * author vipin
+ * date 15/10/2014
  */
 public class DashboardBuilder extends BuildWrapper {
 
