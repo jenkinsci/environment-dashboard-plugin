@@ -37,8 +37,8 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 /**
  * Class to provide build wrapper for Dashboard.
  * 
- * @author vipin
- * @date 15/10/2014
+ * author vipin
+ * date 15/10/2014
  */
 public class EnvDashboardView extends View {
 
