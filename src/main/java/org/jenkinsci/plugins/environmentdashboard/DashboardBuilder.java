@@ -1,15 +1,17 @@
 package org.jenkinsci.plugins.environmentdashboard;
 
+import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.tasks.BuildWrapper;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildWrapperDescriptor;
 import hudson.util.FormValidation;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,8 +23,10 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import jenkins.tasks.SimpleBuildWrapper;
 
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 
 import org.jenkinsci.plugins.environmentdashboard.utils.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -35,15 +39,16 @@ import org.kohsuke.stapler.StaplerRequest;
  * author vipin
  * date 15/10/2014
  */
-public class DashboardBuilder extends BuildWrapper {
+public class DashboardBuilder extends SimpleBuildWrapper implements Serializable {
 
 	private final String nameOfEnv;
 	private final String componentName;
 	private final String buildNumber;
 	private final String buildJob;
 	private final String packageName;
-	private ArrayList<ListItem> data = new ArrayList<ListItem>();
+	private ArrayList<ListItem> data = new ArrayList<>();
 	public boolean addColumns = false;
+        static final long serialVersionUID = 42L;
 
 	@DataBoundConstructor
 	public DashboardBuilder(String nameOfEnv, String componentName, String buildNumber, String buildJob,
@@ -93,9 +98,8 @@ public class DashboardBuilder extends BuildWrapper {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@Override
-	public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
-			throws IOException, InterruptedException {
+        @Override
+        public void setUp(SimpleBuildWrapper.Context context, Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener, EnvVars initialEnvironment) throws IOException, InterruptedException {
 		// PreBuild
 		final Integer numberOfDays = ((getDescriptor().getNumberOfDays() == null) ? 30
 				: getDescriptor().getNumberOfDays());
@@ -126,9 +130,9 @@ public class DashboardBuilder extends BuildWrapper {
 			listener.getLogger().println("Environment dashboard not updated: one or more required values were blank");
 		}
 		// TearDown - This runs post all build steps
-		class TearDownImpl extends Environment {
+		class TearDownImpl extends SimpleBuildWrapper.Disposer implements Serializable {
 			@Override
-			public boolean tearDown(AbstractBuild build, BuildListener listener)
+			public void tearDown(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener)
 					throws IOException, InterruptedException {
 				String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
 				String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
@@ -163,14 +167,13 @@ public class DashboardBuilder extends BuildWrapper {
 
 				}
 
-				return super.tearDown(build, listener);
 			}
 		}
-		return new TearDownImpl();
+		context.setDisposer(new TearDownImpl());
 	}
 
 	@SuppressWarnings("rawtypes")
-	private String writeToDB(AbstractBuild build, BuildListener listener, String envName, String compName,
+	private String writeToDB(Run<?, ?> build, TaskListener listener, String envName, String compName,
 			String currentBuildNum, String runTime, String buildJob, Integer numberOfDays, String packageName,
 			List<ListItem> passedColumnData) {
 		String returnComment = null;
@@ -283,6 +286,7 @@ public class DashboardBuilder extends BuildWrapper {
 		return (DescriptorImpl) super.getDescriptor();
 	}
 
+        @Symbol("environmentDashboard")
 	@Extension
 	public static final class DescriptorImpl extends BuildWrapperDescriptor {
 

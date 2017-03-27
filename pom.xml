@@ -31,6 +31,12 @@
           <version>1.39</version>
           <optional>true</optional>
       </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci</groupId>
+      <artifactId>symbol-annotation</artifactId>
+      <version>1.6</version>
+      <type>jar</type>
+    </dependency>
   </dependencies>
 
   <licenses>
