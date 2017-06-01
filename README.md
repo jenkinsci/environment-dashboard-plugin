@@ -42,7 +42,7 @@ Other information:
 
 
 Configuration
-=============
+=========================
 
 After installing the plugin, you'll get a new option in the Build Environment section of a job configuration page.  If your job deploys to an environment, check the box and complete the form using the context sensitive help.
 
