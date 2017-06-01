@@ -16,7 +16,7 @@ Click on the Environment name to get a historical view of the deployments.
 ## Example set up ##
 
 You have 3 software components:
-* UI
+* UI *
 * Web Application and API
 * Database
 
@@ -42,7 +42,7 @@ Other information:
 
 
 Configuration
-=============
+================================================================================
 
 After installing the plugin, you'll get a new option in the Build Environment section of a job configuration page.  If your job deploys to an environment, check the box and complete the form using the context sensitive help.
 
