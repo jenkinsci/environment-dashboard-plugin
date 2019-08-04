@@ -101,7 +101,7 @@ public class DashboardBuilder extends SimpleBuildWrapper implements Serializable
         @Override
         public void setUp(SimpleBuildWrapper.Context context, Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener, EnvVars initialEnvironment) throws IOException, InterruptedException {
 		// PreBuild
-		final Integer numberOfDays = ((getDescriptor().getNumberOfDays() == null) ? 30
+		final Integer numberOfDays = ((getDescriptor().getNumberOfDays() == null) ? Integer.valueOf(30)
 				: getDescriptor().getNumberOfDays());
 		String passedBuildNumber = build.getEnvironment(listener).expand(buildNumber);
 		String passedEnvName = build.getEnvironment(listener).expand(nameOfEnv);
