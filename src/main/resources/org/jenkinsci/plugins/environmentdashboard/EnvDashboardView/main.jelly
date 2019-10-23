@@ -153,7 +153,7 @@
                                 <!-- Component History -->
                                 <j:forEach items="${orderOfComps}" var="comp">
                                     <j:set var="compLastDeployed" value="${it.getCompLastDeployed(envsHeader, comp)}"/>
-                                    <div id="${comp}_History" style="display: inline-block; position: fixed; top: 100; bottom: 100; left: 0; right: 0; width: 900px; height: 600px; position:fixed; margin: auto; padding: 10px; background-color: #FEFEFE; border: 1px solid; border-color: #DDDDDD; box-shadow: 1px 2px 1px #AAAAAA; border-radius: 15px; display:none; overflow: auto; overflow-x:hidden;">
+                                    <div id="${comp}_History" class="env-dashboard-popup">
                                         <div align="right">
                                             <b onclick="javascript:hideAll()" style="cursor: pointer">[X]</b>
                                         </div>
