@@ -21,6 +21,6 @@
   animation:         deploying 2s infinite; /* IE 10+ */
 }
 
-#side-panel { display: none; }
+#page-body #side-panel { display: none; }
 
-#main-panel { margin-left: 0px; }
+#page-body #main-panel { margin-left: 0px; }
