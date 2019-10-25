@@ -24,3 +24,23 @@
 #page-body #side-panel { display: none; }
 
 #page-body #main-panel { margin-left: 0px; }
+
+.env-dashboard-popup {
+  display: none;
+  position: fixed;
+  top: 100px;
+  bottom: 100px;
+  left: 0;
+  right: 0;
+  min-width: 900px;
+  max-width: 90%;
+  min-height: 600px;
+  max-height: 90%;
+  margin: auto;
+  padding: 10px;
+  background-color: #FEFEFE;
+  border: 1px solid #DDDDDD;
+  box-shadow: 1px 2px 1px #AAAAAA;
+  border-radius: 15px;
+  overflow: auto;
+}
