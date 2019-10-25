@@ -189,6 +189,7 @@ public class EnvDashboardView extends View {
 
 		@SuppressWarnings("unused")
 		public FormValidation doDropColumn(@QueryParameter("column") final String column) {
+			Hudson.getInstance().checkPermission(Jenkins.ADMINISTER);
 			Connection conn = null;
 			Statement stat = null;
 			if ("".equals(column)) {
