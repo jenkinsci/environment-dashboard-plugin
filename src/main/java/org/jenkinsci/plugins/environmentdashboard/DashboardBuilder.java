@@ -140,7 +140,15 @@ public class DashboardBuilder extends SimpleBuildWrapper implements Serializable
 				String passedBuildJob = build.getEnvironment(listener).expand(buildJob);
 				String passedPackageName = build.getEnvironment(listener).expand(packageName);
 				String doDeploy = build.getEnvironment(listener).expand("$UPDATE_ENV_DASH");
-				List<ListItem> passedColumnData = Collections.emptyList();
+				//List<ListItem> passedColumnData = Collections.emptyList();
+				// Pass column data to post-build runQuery
+				List<ListItem> passedColumnData = new ArrayList<ListItem>();
+				if (addColumns) {
+					for (ListItem item : data) {
+						passedColumnData.add(new ListItem(build.getEnvironment(listener).expand(item.columnName),
+								build.getEnvironment(listener).expand(item.contents)));
+					}
+				}
 				String returnComment = null;
 
 				if (passedPackageName == null) {
@@ -172,7 +180,7 @@ public class DashboardBuilder extends SimpleBuildWrapper implements Serializable
 		context.setDisposer(new TearDownImpl());
 	}
 
-	@SuppressWarnings("rawtypes")
+	
 	private String writeToDB(Run<?, ?> build, TaskListener listener, String envName, String compName,
 			String currentBuildNum, String runTime, String buildJob, Integer numberOfDays, String packageName,
 			List<ListItem> passedColumnData) {
@@ -211,12 +219,12 @@ public class DashboardBuilder extends SimpleBuildWrapper implements Serializable
 			columns = columns + ", " + item.columnName;
 			contents = contents + "', '" + item.contents;
 			try {
-				stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS " + item.columnName + " VARCHAR;");
+				stat.execute("ALTER TABLE env_dashboard ADD COLUMN IF NOT EXISTS " + item.columnName + " VARCHAR;");
 			} catch (SQLException e) {
 				returnComment = "WARN: Could not alter table env_dashboard to add column " + item.columnName + ".";
 				return returnComment;
 			}
-		}
+		}		
 		String indexValueofTable = envName + '=' + compName;
 		String currentBuildResult = "UNKNOWN";
 		if (build.getResult() == null && runTime.equals("PRE")) {
@@ -236,19 +244,24 @@ public class DashboardBuilder extends SimpleBuildWrapper implements Serializable
 			buildJobUrl = "";
 		} else {
 			buildJobUrl = "job/" + buildJob + "/" + currentBuildNum;
-		}
-
+		}		
 		String runQuery = null;
 		if (runTime.equals("PRE")) {
 			runQuery = "INSERT INTO env_dashboard (envComp, jobUrl, buildNum, buildStatus, envName, compName, created_at, buildJobUrl, packageName"
 					+ columns + ") VALUES( '" + indexValueofTable + "', '" + currentBuildUrl + "', '" + currentBuildNum
 					+ "', '" + currentBuildResult + "', '" + envName + "', '" + compName + "' , + current_timestamp, '"
-					+ buildJobUrl + "' , '" + packageName + contents + "');";
+					+ buildJobUrl + "' , '" + packageName + contents + "');";			
 		} else {
-			if (runTime.equals("POST")) {
-				runQuery = "UPDATE env_dashboard SET buildStatus = '" + currentBuildResult
-						+ "', created_at = current_timestamp WHERE envComp = '" + indexValueofTable + "' AND joburl = '"
-						+ currentBuildUrl + "';";
+			if (runTime.equals("POST")) {							
+				// Updates build no. and additional columns also in post-build update
+				String updateColumns = "";
+				for (ListItem item : passedColumnData) {
+					updateColumns += "," + item.columnName + "=" + "'" + item.contents + "'";					
+				}
+				runQuery = "UPDATE env_dashboard SET buildNum = '" + currentBuildNum + "', buildStatus = '" + currentBuildResult
+						+ "', created_at = current_timestamp " + updateColumns + " WHERE envComp = '" + indexValueofTable + "' AND joburl = '"
+						+ currentBuildUrl + "';";				
+				listener.getLogger().println("DEBUG: Final Post-Build runQuery:" + runQuery);				
 			} else {
 				if (runTime.equals("NODEPLOY")) {
 					runQuery = "DELETE FROM env_dashboard where envComp = '" + indexValueofTable + "' AND joburl = '"
@@ -260,7 +273,7 @@ public class DashboardBuilder extends SimpleBuildWrapper implements Serializable
 			stat.execute(runQuery);
 		} catch (SQLException e) {
 			returnComment = "Error running query " + runQuery + ".";
-			return returnComment;
+			return returnComment + e;
 		}
 		if (numberOfDays > 0) {
 			runQuery = "DELETE FROM env_dashboard where created_at <= current_timestamp - " + numberOfDays;
