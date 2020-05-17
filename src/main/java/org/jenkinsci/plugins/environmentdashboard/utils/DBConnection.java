@@ -1,11 +1,9 @@
 package org.jenkinsci.plugins.environmentdashboard.utils;
 
-import hudson.model.Hudson;
-
+import jenkins.model.Jenkins;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 import java.io.File;
 
 /**
@@ -15,6 +13,10 @@ import java.io.File;
  * date 18/10/2014
  */
 public class DBConnection {
+	
+	private DBConnection(){
+		
+	}
 
 	private static Connection con = null;
 
@@ -26,7 +28,7 @@ public class DBConnection {
 	public static Connection getConnection() {
 
 		// Generate connection String for DB driver.
-		String dbConnectionString = "jdbc:h2:" + Hudson.getInstance().root.toString() + File.separator
+		String dbConnectionString = "jdbc:h2:" + Jenkins.get().root.toString() + File.separator
 				+ "jenkins_dashboard" + ";MVCC=true";
 
 		// Load driver and connect to DB

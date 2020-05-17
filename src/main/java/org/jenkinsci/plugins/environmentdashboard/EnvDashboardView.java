@@ -4,29 +4,25 @@ import hudson.Extension;
 import hudson.model.Item;
 import hudson.model.TopLevelItem;
 import hudson.model.Descriptor.FormException;
-import hudson.model.Hudson;
 import hudson.model.View;
 import hudson.model.ViewDescriptor;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-
+import java.util.LinkedHashMap;
+import java.util.List;
 import javax.servlet.ServletException;
-
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.jenkinsci.plugins.environmentdashboard.utils.DBConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -47,14 +43,21 @@ public class EnvDashboardView extends View {
 	private String compOrder = null;
 
 	private String deployHistory = null;
+	
+	private static final String REG_PATTERN = "\\s*,\\s*";
+	
+	private static final int DEPLOYMENT_HISTORY = 10;
+	
+	private DeploymentData deploymentData = null;
 
 	@DataBoundConstructor
 	public EnvDashboardView(final String name, final String envOrder, final String compOrder,
 			final String deployHistory) {
-		super(name, Hudson.getInstance());
+		super(name, Jenkins.get());
 		this.envOrder = envOrder;
 		this.compOrder = compOrder;
 		this.deployHistory = deployHistory;
+		this.deploymentData = new DeploymentData();
 	}
 
 	static {
@@ -62,21 +65,11 @@ public class EnvDashboardView extends View {
 	}
 
 	private static void ensureCorrectDBSchema() {
-		String returnComment = "";
-		Connection conn = null;
-		Statement stat = null;
-		conn = DBConnection.getConnection();
-		try {
-			assert conn != null;
-			stat = conn.createStatement();
-		} catch (SQLException e) {
-			System.out.println("E13" + e.getMessage());
-		}
-		try {
+		try(Connection conn = DBConnection.getConnection();
+				Statement stat = conn.createStatement();) {
 			stat.execute("ALTER TABLE env_dashboard ADD IF NOT EXISTS packageName VARCHAR(255);");
 		} catch (SQLException e) {
-			System.out.println(
-					"E14: Could not alter table to add package column to table env_dashboard.\n" + e.getMessage());
+			System.err.println("E14: Could not alter table to add package column to table env_dashboard.\n" + e.getMessage());
 		} finally {
 			DBConnection.closeConnection();
 		}
@@ -90,9 +83,8 @@ public class EnvDashboardView extends View {
 
 	@RequirePOST
 	public void doPurgeSubmit(final StaplerRequest req, StaplerResponse res)
-			throws IOException, ServletException, FormException {
+			throws IOException, ServletException {
 		checkPermission(Jenkins.ADMINISTER);
-
 		Connection conn = null;
 		Statement stat = null;
 		conn = DBConnection.getConnection();
@@ -110,16 +102,244 @@ public class EnvDashboardView extends View {
 
 	@Override
 	public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-		return Hudson.getInstance().doCreateItem(req, rsp);
+		return Jenkins.get().doCreateItem(req, rsp);
 	}
 
+	public String[] splitEnvOrder(String envOrder) {
+		if (!"".equals(envOrder)) {
+			StringBuilder envBuilder = new StringBuilder();
+			String[] envs = envOrder.split(REG_PATTERN);
+			for(String env : envs) {
+				envBuilder.append(env+",");
+			}
+			envBuilder.setLength(envBuilder.length() - 1);
+			deploymentData.setEnvironments(envBuilder.toString());
+			return envOrder.split(REG_PATTERN);
+		} else {
+			return ArrayUtils.EMPTY_STRING_ARRAY;
+		}
+	}
+
+	public String[] splitCompOrder(String compOrder) {
+		if (!"".equals(compOrder)) {
+			StringBuilder componentBuilder = new StringBuilder();
+			String[] components = compOrder.split(REG_PATTERN);
+			for(String component : components) {
+				componentBuilder.append(component+",");
+			}
+			componentBuilder.setLength(componentBuilder.length() -1);
+			deploymentData.setComponents(componentBuilder.toString());
+			return compOrder.split(REG_PATTERN);
+		} else {
+			return ArrayUtils.EMPTY_STRING_ARRAY;
+		}
+	}
+
+	public ResultSet runQuery(String queryString) {
+		// Get DB connection
+		try {
+			Connection conn = DBConnection.getConnection();
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery(queryString);
+			return rs;
+		} catch (SQLException e) {
+			System.err.println("E3" + e.getMessage());
+		}
+		return null;
+	}
+
+	public String[] getOrderOfEnvs() {
+		String[] orderOfEnvs = splitEnvOrder(envOrder);
+		if (orderOfEnvs == null || orderOfEnvs.length == 0) {
+			String queryString = "select distinct envname from env_dashboard order by envname;";
+			try {
+				ResultSet rs = runQuery(queryString);
+				if (rs == null) {
+					return ArrayUtils.EMPTY_STRING_ARRAY;
+				}
+				StringBuilder environments = new StringBuilder();
+				while (rs.next()) {
+					environments.append(rs.getString("envName")+",");
+				}
+				environments.setLength(environments.length() - 1);
+				orderOfEnvs = environments.toString().split(REG_PATTERN);
+				deploymentData.setEnvironments(environments.toString());
+			} catch (SQLException e) {
+				System.err.println("E6" + e.getMessage());
+			} finally {
+				DBConnection.closeConnection();
+			}
+		}
+		return orderOfEnvs;
+	}
+
+	public String[] getOrderOfComps() {
+		String[] orderOfComps = splitCompOrder(compOrder);
+		if (orderOfComps == null || orderOfComps.length == 0) {
+			String queryString = "select distinct compname from env_dashboard order by compname;";
+			try {
+				ResultSet rs = runQuery(queryString);
+				if (rs == null) {
+					return ArrayUtils.EMPTY_STRING_ARRAY;
+				}
+				StringBuilder components = new StringBuilder();
+				while (rs.next()) {
+					components.append(rs.getString("compName")+",");
+				}
+				components.setLength(components.length() - 1);
+				orderOfComps = components.toString().split(REG_PATTERN);
+				deploymentData.setComponents(components.toString());
+			} catch (SQLException e) {
+				System.err.println("E8" + e.getMessage());
+			} finally {
+				DBConnection.closeConnection();
+			}
+		}
+		return orderOfComps;
+	}
+
+	public int getLimitDeployHistory() {
+		try {
+			if (deployHistory == null || deployHistory.isEmpty()) {
+				return DEPLOYMENT_HISTORY;
+			} else {
+				return Integer.parseInt(deployHistory);
+			}
+		} catch (NumberFormatException e) {
+			return DEPLOYMENT_HISTORY;
+		}
+	}
+
+	public String anyJobsConfigured() {
+		deploymentData = new DeploymentData();
+		String[] orderOfEnvs = getOrderOfEnvs();
+		if (orderOfEnvs == null || orderOfEnvs.length == 0) {
+			return "NONE";
+		} else {
+			return "ENVS";
+		}
+	}
+
+	public String getNiceTimeStamp(String timeStamp) {
+		return timeStamp == null ? null : timeStamp.substring(0, 19);
+	}
+	
+	public Deployment getDeploymentResultSet(ResultSet rs) throws SQLException {
+		Deployment deployment = new Deployment();
+		deployment.setEnvName(rs.getString("envName"));
+		deployment.setCompName(rs.getString("compName"));
+		deployment.setBuildstatus(rs.getString("buildstatus"));
+		deployment.setBuildJobUrl(rs.getString("buildJobUrl"));
+		deployment.setJobUrl(rs.getString("jobUrl"));
+		deployment.setBuildNum(rs.getString("buildNum"));
+		deployment.setPackageName(rs.getString("packageName"));
+		deployment.setCreatedAt(rs.getString("created_at"));
+		return deployment;
+	}
+	
+	public List<Deployment> getDeployments(int lastDeploy) {
+		if(deploymentData.getAllDeploymentList() == null || deploymentData.getAllDeploymentList().isEmpty()) {
+			if (lastDeploy <= 0) {
+				lastDeploy = DEPLOYMENT_HISTORY;
+			}
+			StringBuilder sqlBuilder = new StringBuilder();
+			for(String compName : deploymentData.getComponents().split(REG_PATTERN)) {
+				for(String envName : deploymentData.getEnvironments().split(REG_PATTERN)) {
+					sqlBuilder.append("(select envName, compName, buildstatus, buildJobUrl, jobUrl, buildNum, packageName, created_at from env_dashboard "
+							+ "where envName='"+envName+"' and compName='"+compName+"' order by created_at desc limit "+lastDeploy+") ");
+					sqlBuilder.append("UNION ");
+				}
+			}
+			sqlBuilder.setLength(sqlBuilder.length() - 6);
+			sqlBuilder.append("order by created_at desc;");
+			try {
+				ResultSet resultSetObj = runQuery(sqlBuilder.toString());
+				while (resultSetObj.next()) {
+					formDataStructure(resultSetObj);
+				}
+			} catch (SQLException e) {
+				System.err.println("E11" + e.getMessage());
+			} finally {
+				DBConnection.closeConnection();
+			}
+		}
+		return deploymentData.getAllDeploymentList();
+	}
+	
+	private void formDataStructure(ResultSet resultSetObj) throws SQLException {
+		Deployment deploymentObj = getDeploymentResultSet(resultSetObj);
+		if(!deploymentData.getDeployments().containsKey(deploymentObj.getEnvName())) {
+			LinkedHashMap<String, ArrayList<Deployment>> compDeployments = new LinkedHashMap<>(); 
+			ArrayList<Deployment> deployment = new ArrayList<>();
+			deployment.add(deploymentObj);
+			compDeployments.put(deploymentObj.getCompName(), deployment);
+			deploymentData.getDeployments().put(deploymentObj.getEnvName(), compDeployments);
+		} else if(deploymentData.getDeployments().containsKey(deploymentObj.getEnvName()) && 
+				!deploymentData.getDeployments().get(deploymentObj.getEnvName()).containsKey(deploymentObj.getCompName())) {
+			ArrayList<Deployment> deployment = new ArrayList<>();
+			deployment.add(deploymentObj);
+			deploymentData.getDeployments().get(deploymentObj.getEnvName()).put(deploymentObj.getCompName(), deployment);
+		} else {
+			deploymentData.getDeployments().get(deploymentObj.getEnvName()).get(deploymentObj.getCompName()).add(deploymentObj);
+		}
+		deploymentData.getAllDeploymentList().add(deploymentObj);
+	}
+
+	public Deployment getCompLastDeployed(String envName, String compName) {
+		try {
+			return deploymentData.getDeployments().get(envName).get(compName).get(0);
+		} catch(ArrayIndexOutOfBoundsException exp) {
+			return null;
+		}
+	}
+
+	/**
+	 * Popup per Env per Component
+	 * @param compName
+	 * @param envName
+	 * @returns list of deployments
+	 */
+	public List<Deployment> getDeploymentsByCompEnv(String compName, String envName) {
+		if(deploymentData.getDeployments().containsKey(envName) && 
+				deploymentData.getDeployments().get(envName).containsKey(compName)) {
+			return deploymentData.getDeployments().get(envName).get(compName);
+		} else {
+			return new ArrayList<>();
+		}
+	}
+	
+	/**
+	 * Component History & Popup per Env per Component
+	 * @param compName
+	 * @return list of deployments
+	 */
+	public List<Deployment> getDeploymentsByComp(String compName) {
+		ArrayList<Deployment> deployments = new ArrayList<>();
+		for(Deployment deployment : deploymentData.getAllDeploymentList()) {
+			if(deployment.getCompName().equalsIgnoreCase(compName)) {
+				deployments.add(deployment);
+			}
+		}
+		return deployments;
+	}
+	
+	public String getDeploymentObjValue(Deployment deploymentObj, String fieldName) {
+		try {
+			Field field = deploymentObj.getClass().getDeclaredField(fieldName);    
+			field.setAccessible(true);
+			return field.get(fieldName).toString();
+		} catch(Exception exp) {
+			return null;
+		}
+	}
+	
 	@Extension
 	public static final class DescriptorImpl extends ViewDescriptor {
 
 		private String envOrder;
 		private String compOrder;
 		private String deployHistory;
-
+		
 		/**
 		 * descriptor impl constructor This empty constructor is required for
 		 * stapler. If you remove this constructor, text name of
@@ -129,67 +349,30 @@ public class EnvDashboardView extends View {
 			load();
 		}
 
-		public static ArrayList<String> getCustomColumns() {
-			Connection conn = null;
-			Statement stat = null;
-			ArrayList<String> columns;
-			columns = new ArrayList<String>();
-			String queryString = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='ENV_DASHBOARD';";
-			String[] fields = { "envComp", "compName", "envName", "buildstatus", "buildJobUrl", "jobUrl", "buildNum",
-					"created_at", "packageName" };
-			boolean columnFound = false;
-			try {
-				ResultSet rs = null;
-				conn = DBConnection.getConnection();
-
-				try {
-					assert conn != null;
-					stat = conn.createStatement();
-				} catch (SQLException e) {
-					System.out.println("E3" + e.getMessage());
-				}
-				try {
-					assert stat != null;
-					rs = stat.executeQuery(queryString);
-				} catch (SQLException e) {
-					System.out.println("E4" + e.getMessage());
-				}
-				String col = "";
-				while (rs.next()) {
-					columnFound = false;
-					col = rs.getString("COLUMN_NAME");
-					for (String presetColumn : fields) {
-						if (col.toLowerCase().equals(presetColumn.toLowerCase())) {
-							columnFound = true;
-							break;
-						}
-					}
-					if (!columnFound) {
-						columns.add(col.toLowerCase());
-					}
-				}
-				DBConnection.closeConnection();
-			} catch (SQLException e) {
-				System.out.println("E11" + e.getMessage());
-				return null;
+		/**
+		 * @returns all the column names
+		 */
+		public static List<String> getCustomColumns() {
+			ArrayList<String> columns = new ArrayList<>();
+			Field[] fields = Deployment.class.getDeclaredFields();
+			for(Field field: fields) {
+				columns.add(field.getName());
 			}
 			return columns;
 		}
 
 		public ListBoxModel doFillColumnItems() {
 			ListBoxModel m = new ListBoxModel();
-			ArrayList<String> columns = getCustomColumns();
-			int position = 0;
+			List<String> columns = getCustomColumns();
 			m.add("Select column to remove", "");
-			for (String col : columns) {
-				m.add(col, col);
+			for (String column : columns) {
+				m.add(column, column);
 			}
 			return m;
 		}
 
-		@SuppressWarnings("unused")
 		public FormValidation doDropColumn(@QueryParameter("column") final String column) {
-			Hudson.getInstance().checkPermission(Jenkins.ADMINISTER);
+			Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 			Connection conn = null;
 			Statement stat = null;
 			if ("".equals(column)) {
@@ -238,261 +421,13 @@ public class EnvDashboardView extends View {
 		}
 	}
 
-	public ArrayList<String> splitEnvOrder(String envOrder) {
-		ArrayList<String> orderOfEnvs = new ArrayList<String>();
-		if (!"".equals(envOrder)) {
-			orderOfEnvs = new ArrayList<String>(Arrays.asList(envOrder.split("\\s*,\\s*")));
-		}
-		return orderOfEnvs;
-	}
-
-	public ArrayList<String> splitCompOrder(String compOrder) {
-		ArrayList<String> orderOfComps = new ArrayList<String>();
-		if (!"".equals(compOrder)) {
-			orderOfComps = new ArrayList<String>(Arrays.asList(compOrder.split("\\s*,\\s*")));
-		}
-		return orderOfComps;
-	}
-
-	public ResultSet runQuery(String queryString) {
-		Connection conn = null;
-		Statement stat = null;
-
-		ResultSet rs = null;
-
-		// Get DB connection
-		conn = DBConnection.getConnection();
-
-		try {
-			assert conn != null;
-			stat = conn.createStatement();
-		} catch (SQLException e) {
-			System.out.println("E3" + e.getMessage());
-		}
-		try {
-			assert stat != null;
-			rs = stat.executeQuery(queryString);
-		} catch (SQLException e) {
-			System.out.println("E4" + e.getMessage());
-		}
-		return rs;
-	}
-
-	public ArrayList<String> getOrderOfEnvs() {
-		ArrayList<String> orderOfEnvs;
-		orderOfEnvs = splitEnvOrder(envOrder);
-		if (orderOfEnvs == null || orderOfEnvs.isEmpty()) {
-			String queryString = "select distinct envname from env_dashboard order by envname;";
-			try {
-				ResultSet rs = runQuery(queryString);
-				if (rs == null) {
-					return null;
-				}
-				while (rs.next()) {
-					if (orderOfEnvs != null) {
-						orderOfEnvs.add(rs.getString("envName"));
-					}
-				}
-				DBConnection.closeConnection();
-			} catch (SQLException e) {
-				System.out.println("E6" + e.getMessage());
-				return null;
-			}
-		}
-		return orderOfEnvs;
-	}
-
-	public ArrayList<String> getOrderOfComps() {
-		ArrayList<String> orderOfComps;
-		orderOfComps = splitCompOrder(compOrder);
-		if (orderOfComps == null || orderOfComps.isEmpty()) {
-			String queryString = "select distinct compname from env_dashboard order by compname;";
-			try {
-				ResultSet rs = runQuery(queryString);
-				while (rs.next()) {
-					if (orderOfComps != null) {
-						orderOfComps.add(rs.getString("compName"));
-					}
-				}
-				DBConnection.closeConnection();
-			} catch (SQLException e) {
-				System.out.println("E8" + e.getMessage());
-				return null;
-			}
-		}
-		return orderOfComps;
-	}
-
-	public Integer getLimitDeployHistory() {
-		Integer lastDeploy;
-		if (deployHistory == null || deployHistory.equals("")) {
-			return 10;
-		} else {
-			try {
-				lastDeploy = Integer.parseInt(deployHistory);
-			} catch (NumberFormatException e) {
-				return 10;
-			}
-		}
-		return lastDeploy;
-	}
-
-	public ArrayList<String> getDeployments(String env, Integer lastDeploy) {
-		if (lastDeploy <= 0) {
-			lastDeploy = 10;
-		}
-		ArrayList<String> deployments;
-		deployments = new ArrayList<String>();
-		String queryString = "select top " + lastDeploy + " created_at from env_dashboard where envName ='" + env
-				+ "' order by created_at desc;";
-		try {
-			ResultSet rs = runQuery(queryString);
-			while (rs.next()) {
-				deployments.add(rs.getString("created_at"));
-			}
-			DBConnection.closeConnection();
-		} catch (SQLException e) {
-			System.out.println("E11" + e.getMessage());
-			return null;
-		}
-		return deployments;
-	}
-
-	public String anyJobsConfigured() {
-		ArrayList<String> orderOfEnvs;
-		orderOfEnvs = getOrderOfEnvs();
-		if (orderOfEnvs == null || orderOfEnvs.isEmpty()) {
-			return "NONE";
-		} else {
-			return "ENVS";
-		}
-	}
-
-	public String getNiceTimeStamp(String timeStamp) {
-		return timeStamp.substring(0, 19);
-	}
-
-	public HashMap getCompDeployed(String env, String time) {
-		HashMap<String, String> deployment;
-		deployment = new HashMap<String, String>();
-		String[] fields = { "buildstatus", "compName", "buildJobUrl", "jobUrl", "buildNum", "packageName" };
-		String queryString = "select " + StringUtils.join(fields, ", ").replace(".$", "")
-				+ " from env_dashboard where envName = '" + env + "' and created_at = '" + time + "';";
-		try {
-			ResultSet rs = runQuery(queryString);
-			rs.next();
-			for (String field : fields) {
-				deployment.put(field, rs.getString(field));
-			}
-			DBConnection.closeConnection();
-		} catch (SQLException e) {
-			System.out.println("E10" + e.getMessage());
-			System.out.println("Error executing: " + queryString);
-		}
-		return deployment;
-	}
-
-	public ArrayList<String> getCustomDBColumns() {
+	public List<String> getCustomDBColumns() {
 		return DescriptorImpl.getCustomColumns();
-	}
-
-	public ArrayList<HashMap<String, String>> getDeploymentsByComp(String comp, Integer lastDeploy) {
-		if (lastDeploy <= 0) {
-			lastDeploy = 10;
-		}
-		ArrayList<HashMap<String, String>> deployments;
-		deployments = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> hash;
-		String[] fields = { "envName", "buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at",
-				"packageName" };
-		ArrayList<String> allDBFields = getCustomDBColumns();
-		for (String field : fields) {
-			allDBFields.add(field);
-		}
-		String queryString = "select top " + lastDeploy + " * from env_dashboard where compName='" + comp
-				+ "' order by created_at desc;";
-		try {
-			ResultSet rs = runQuery(queryString);
-			while (rs.next()) {
-				hash = new HashMap<String, String>();
-				for (String field : allDBFields) {
-					hash.put(field, rs.getString(field));
-				}
-				deployments.add(hash);
-			}
-			DBConnection.closeConnection();
-		} catch (SQLException e) {
-			System.out.println("E11" + e.getMessage());
-			return null;
-		}
-		return deployments;
-	}
-
-	public ArrayList<HashMap<String, String>> getDeploymentsByCompEnv(String comp, String env, Integer lastDeploy) {
-		if (lastDeploy <= 0) {
-			lastDeploy = 10;
-		}
-		ArrayList<HashMap<String, String>> deployments;
-		deployments = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> hash;
-		String[] fields = { "envName", "buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at",
-				"packageName" };
-		ArrayList<String> allDBFields = getCustomDBColumns();
-		for (String field : fields) {
-			allDBFields.add(field);
-		}
-		String queryString = "select top " + lastDeploy + " " + StringUtils.join(allDBFields, ", ").replace(".$", "")
-				+ " from env_dashboard where compName='" + comp + "' and envName='" + env
-				+ "' order by created_at desc;";
-		try {
-			ResultSet rs = runQuery(queryString);
-			while (rs.next()) {
-				hash = new HashMap<String, String>();
-				for (String field : allDBFields) {
-					hash.put(field, rs.getString(field));
-				}
-				deployments.add(hash);
-			}
-			DBConnection.closeConnection();
-		} catch (SQLException e) {
-			System.out.println("E11" + e.getMessage());
-			return null;
-		}
-		return deployments;
-	}
-
-	public HashMap getCompLastDeployed(String env, String comp) {
-		HashMap<String, String> deployment;
-		deployment = new HashMap<String, String>();
-		String[] fields = { "buildstatus", "buildJobUrl", "jobUrl", "buildNum", "created_at", "packageName" };
-		ArrayList<String> allDBFields = getCustomDBColumns();
-		for (String field : fields) {
-			allDBFields.add(field);
-		}
-		String queryString = "select top 1 " + StringUtils.join(allDBFields, ", ").replace(".$", "")
-				+ " from env_dashboard where envName = '" + env + "' and compName = '" + comp
-				+ "' order by created_at desc;";
-		try {
-			ResultSet rs = runQuery(queryString);
-			rs.next();
-			for (String field : allDBFields) {
-				deployment.put(field, rs.getString(field));
-			}
-			DBConnection.closeConnection();
-		} catch (SQLException e) {
-			if (e.getErrorCode() == 2000) {
-				// We'll assume this comp has never been deployed to this env }
-			} else {
-				System.out.println("E12" + e.getMessage());
-				System.out.println("Error executing: " + queryString);
-			}
-		}
-		return deployment;
 	}
 
 	@Override
 	public Collection<TopLevelItem> getItems() {
-	        return Collections.EMPTY_LIST;
+	        return Collections.emptyList();
 	}
 
 	public String getEnvOrder() {
