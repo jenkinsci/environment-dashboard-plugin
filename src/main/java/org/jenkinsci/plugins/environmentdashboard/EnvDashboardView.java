@@ -479,6 +479,5 @@ public class EnvDashboardView extends View {
 
 	@Override
 	public void onJobRenamed(Item item, String s, String s2) {
-
 	}
 }
