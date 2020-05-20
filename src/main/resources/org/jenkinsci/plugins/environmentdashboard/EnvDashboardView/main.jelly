@@ -39,7 +39,7 @@
                                             <th style="text-align:center">Build</th>
                                             <j:set var="hasPackageColumn" value="${false}"/>
                                             <j:forEach items="${it.getDeployments(limitDeploy)}" var="deploymentObj">
-                                                <j:if test="${deploymentObj.getPackageName() != null &amp;&amp; !deploymentObj.getPackageName().equals('')}">
+                                                <j:if test="${deploymentObj.get('packagename') != null &amp;&amp; !deploymentObj.get('packagename').equals('')}">
                                                     <j:set var="hasPackageColumn" value="${true}"/>
                                                 </j:if>
                                             </j:forEach>
@@ -50,10 +50,10 @@
                                         </tbody>
                                         <j:forEach items="${it.getDeployments(limitDeploy)}" var="deploymentObj">
                                             <tr>
-                                                <td>${deploymentObj.getCompName()}</td>
+                                                <td>${deploymentObj.get('compname')}</td>
                                                 <td>
-													<j:switch on="${deploymentObj.getBuildstatus()}">
-                                                        <a title="View" href="${deploymentObj.get('buildJobUrl')}">${deploymentObj.getBuildNum()}</a>
+													<j:switch on="${deploymentObj.get('buildstatus')}">
+                                                        <a title="View" href="${deploymentObj.get('buildjoburl')}">${deploymentObj.get('buildnum')}</a>
 														<j:case value="SUCCESS">
                                                             <span title="SUCCESS" style="color:green;">&#10004;</span>
 														</j:case>
@@ -70,11 +70,11 @@
 												</td>
                                                 <j:if test="${hasPackageColumn}">
                                                     <td>
-                                                        ${deploymentObj.getPackageName()}
+                                                        ${deploymentObj.get('packagename')}
                                                     </td>
                                                 </j:if>
 												<td>
-													<a title="View Deployment" href="${deploymentObj.getJobUrl()}">${it.getNiceTimeStamp(deploymentObj).getCreatedAt()}</a>
+													<a title="View Deployment" href="${deploymentObj.get('joburl')}">${it.getNiceTimeStamp(deploymentObj.get('created_at'))}</a>
 												</td>
                                             </tr>
                                         </j:forEach>
@@ -92,7 +92,7 @@
                                          <table class="table table-bordered table-striped table-condensed">
                                             <tbody>
                                                 <th style="width: 8%;text-align:center">Build</th>
-                                                <j:if test="${compDeploymentObj.getPackageName() != null &amp;&amp; !compDeploymentObj.getPackageName().equals('')}">
+                                                <j:if test="${compDeploymentObj.get('packagename') != null &amp;&amp; !compDeploymentObj.get('packagename').equals('')}">
                                                     <th style="text-align:center">Package</th>
                                                 </j:if>
                                                 <j:forEach items="${customColumnsList}" var="columnName">
@@ -106,11 +106,11 @@
                                             <j:forEach items="${it.getDeploymentsByCompEnv(compName, envsHeader)}" var="deployment">
                                                     <tr>
                                                         <td>
-                                                            <a title="View Deployment" href="${deployment.getJobUrl()}">${deployment.getBuildNum()}</a>
+                                                            <a title="View Deployment" href="${deployment.get('joburl')}">${deployment.get('buildnum')}</a>
                                                         </td>
-                                                        <j:if test="${deployment.getPackageName() != null &amp;&amp; !deployment.getPackageName().equals('')}">
+                                                        <j:if test="${deployment.get('packagename') != null &amp;&amp; !deployment.get('packagename').equals('')}">
                                                             <td style="word-wrap:break-word">
-                                                                ${deployment.getPackageName()}
+                                                                ${deployment.get('packagename')}
                                                             </td>
                                                         </j:if>
                                                         <j:forEach items="${customColumnsList}" var="columnName">
@@ -121,7 +121,7 @@
                                                             </j:if>
                                                         </j:forEach>
                                                         <td>
-                                                            <j:switch on="${deployment.getBuildstatus()}">
+                                                            <j:switch on="${deployment.get('buildstatus')}">
                                                                 <j:case value="SUCCESS">
                                                                     <span title="SUCCESS" style="color:green;">&#10004;</span>
                                                                 </j:case>
@@ -137,7 +137,7 @@
                                                             </j:switch>
                                                         </td>
                                                         <td>
-                                                            <a title="View Deployment" href="${deployment.getJobUrl()}">${it.getNiceTimeStamp(deployment.getCreatedAt())}</a>
+                                                            <a title="View Deployment" href="${deployment.get('joburl')}">${it.getNiceTimeStamp(deployment.get('created_at'))}</a>
                                                         </td>
                                                     </tr>
                                             </j:forEach>      
@@ -159,7 +159,7 @@
                                                 <th style="text-align:center">Env</th>
                                                 <th style="text-align:center">Build</th>
                                                 <th style="text-align:center">Status</th>
-                                                <j:if test="${compLastDeployed.getPackageName() != null &amp;&amp; !compLastDeployed.getPackageName().equals('')}">
+                                                <j:if test="${compLastDeployed.get('packagename') != null &amp;&amp; !compLastDeployed.get('packagename').equals('')}">
                                                     <th style="text-align:center">Package</th>
                                                 </j:if>
                                                 <th style="text-align:center">Time</th>
@@ -168,13 +168,13 @@
                                             <j:forEach items="${it.getDeploymentsByComp(compName)}" var="deployment">
                                                 <tr>
                                                     <td>
-                                                        ${deployment.getEnvName()}
+                                                        ${deployment.get('envname')}
                                                     </td>
                                                     <td>
-                                                        <a title="View Deployment" href="${deployment.getJobUrl()}">${deployment.getBuildNum()}</a>
+                                                        <a title="View Deployment" href="${deployment.get('joburl')}">${deployment.get('buildnum')}</a>
                                                     </td>
                                                     <td>
-                                                        <j:switch on="${deployment.getBuildstatus()}">
+                                                        <j:switch on="${deployment.get('buildstatus')}">
                                                             <j:case value="SUCCESS">
                                                                 <span title="SUCCESS" style="color:green;">&#10004;</span>
                                                             </j:case>
@@ -189,13 +189,13 @@
                                                             </j:default>
                                                         </j:switch>
                                                     </td>
-                                                    <j:if test="${deployment.getPackageName() != null &amp;&amp; !deployment.getPackageName().equals('')}">
+                                                    <j:if test="${deployment.get('packagename') != null &amp;&amp; !deployment.get('packagename').equals('')}">
                                                         <td>
-                                                            ${deployment.getPackageName()}
+                                                            ${deployment.get('packagename')}
                                                         </td>
                                                     </j:if>
                                                     <td>
-                                                        <a title="View Deployment" href="${deployment.getJobUrl()}">${it.getNiceTimeStamp(deployment.getCreatedAt())}</a>
+                                                        <a title="View Deployment" href="${deployment.get('joburl')}">${it.getNiceTimeStamp(deployment.get('created_at'))}</a>
                                                     </td>
                                                 </tr>
                                             </j:forEach>      
@@ -213,8 +213,8 @@
                             <td align="center"><strong><a href="javascript:toggle('${compName}_History')">${compName}</a></strong></td>
                             <j:forEach items="${orderOfEnvs}" var="envName">
                                 <j:set var="mainDeploymentObj" value="${it.getCompLastDeployed(envName,compName)}"/>
-                                <j:if test="${mainDeploymentObj!=null}">
-                                    <j:switch on="${mainDeploymentObj.getBuildstatus()}">
+                                <j:if test="${!mainDeploymentObj.isEmpty()}">
+                                    <j:switch on="${mainDeploymentObj.get('buildstatus')}">
                                         <j:case value="SUCCESS">
                                             <j:set var="bgcol" value="#DAF5DA;"/>
                                             <j:set var="clss" value="notused"/>
@@ -240,9 +240,9 @@
                                     <td class="${clss}" style="background-color:${bgcol} padding 1.5% 1.5%;" align="center">
                                         <a style="text-decoration:none; color:blue; font-size:medium;" title="View" href="javascript:toggle('${compName}_${envName}_Popup');">
                                             <strong>
-                                                <j:if test="${mainDeploymentObj.getPackageName().equals('') || mainDeploymentObj.getPackageName() == null}">${mainDeploymentObj.getBuildNum()}</j:if>
-                                                <j:if test="${!mainDeploymentObj.getPackageName().equals('') &amp;&amp; mainDeploymentObj.getPackageName() != null}">${mainDeploymentObj.getPackageName()}</j:if>
-												<j:switch on="${mainDeploymentObj.getBuildstatus()}">
+                                                <j:if test="${mainDeploymentObj.get('packagename').equals('') || mainDeploymentObj.get('packagename') == null}">${mainDeploymentObj.get('buildnum')}</j:if>
+                                                <j:if test="${!mainDeploymentObj.get('packagename').equals('') &amp;&amp; mainDeploymentObj.get('packagename') != null}">${mainDeploymentObj.get('packagename')}</j:if>
+												<j:switch on="${mainDeploymentObj.get('buildstatus')}">
 													<j:case value="SUCCESS">
                                                         <span title="SUCCESS" style="color:green;">&#10004;</span>
 													</j:case>
@@ -260,12 +260,12 @@
                                         </a>
                                         <div align="right">
                                             <code>
-                                                <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${mainDeploymentObj.getJobUrl()}${extn}">[${it.getNiceTimeStamp(mainDeploymentObj.getCreatedAt())}]</a>
+                                                <a style="font-size:small; text-decoration:none;" title="View Deployment" href="${mainDeploymentObj.get('joburl')}${extn}">[${it.getNiceTimeStamp(mainDeploymentObj.get('created_at'))}]</a>
                                             </code>
                                         </div>
                                     </td>
                                 </j:if>
-                                <j:if test="${mainDeploymentObj==null}">
+                                <j:if test="${mainDeploymentObj.isEmpty()}">
                                     <td>
                                         <div align="center" style="font-size:15px;"><strong>---</strong></div>
                                     </td>

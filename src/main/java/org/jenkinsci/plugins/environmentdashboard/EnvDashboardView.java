@@ -9,7 +9,6 @@ import hudson.model.ViewDescriptor;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,8 +16,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -49,6 +50,18 @@ public class EnvDashboardView extends View {
 	private static final int DEPLOYMENT_HISTORY = 10;
 	
 	private DeploymentData deploymentData = null;
+	
+	private static final ArrayList<String> FIELDS = new ArrayList<String>() {{
+	    add("envcomp");
+	    add("compname");
+	    add("envname");
+	    add("buildstatus");
+	    add("buildjoburl");
+	    add("joburl");
+	    add("buildnum");
+	    add("created_at");
+	    add("packageName");
+	}};
 
 	@DataBoundConstructor
 	public EnvDashboardView(final String name, final String envOrder, final String compOrder,
@@ -224,20 +237,15 @@ public class EnvDashboardView extends View {
 		return timeStamp == null ? null : timeStamp.substring(0, 19);
 	}
 	
-	public Deployment getDeploymentResultSet(ResultSet rs) throws SQLException {
-		Deployment deployment = new Deployment();
-		deployment.setEnvName(rs.getString("envName"));
-		deployment.setCompName(rs.getString("compName"));
-		deployment.setBuildstatus(rs.getString("buildstatus"));
-		deployment.setBuildJobUrl(rs.getString("buildJobUrl"));
-		deployment.setJobUrl(rs.getString("jobUrl"));
-		deployment.setBuildNum(rs.getString("buildNum"));
-		deployment.setPackageName(rs.getString("packageName"));
-		deployment.setCreatedAt(rs.getString("created_at"));
-		return deployment;
+	public Map<String, String> getDeploymentResultSet(ResultSet rs) throws SQLException {
+		HashMap<String, String> values = new HashMap<>();
+		for (String field :  getCustomDBColumns()) {
+			values.put(field, rs.getString(field));
+		}
+		return values;
 	}
 	
-	public List<Deployment> getDeployments(int lastDeploy) {
+	public List<Map<String, String>> getDeployments(int lastDeploy) {
 		if(deploymentData.getAllDeploymentList() == null || deploymentData.getAllDeploymentList().isEmpty()) {
 			if (lastDeploy <= 0) {
 				lastDeploy = DEPLOYMENT_HISTORY;
@@ -245,7 +253,7 @@ public class EnvDashboardView extends View {
 			StringBuilder sqlBuilder = new StringBuilder();
 			for(String compName : deploymentData.getComponents().split(REG_PATTERN)) {
 				for(String envName : deploymentData.getEnvironments().split(REG_PATTERN)) {
-					sqlBuilder.append("(select envName, compName, buildstatus, buildJobUrl, jobUrl, buildNum, packageName, created_at from env_dashboard "
+					sqlBuilder.append("(select * from env_dashboard "
 							+ "where envName='"+envName+"' and compName='"+compName+"' order by created_at desc limit "+lastDeploy+") ");
 					sqlBuilder.append("UNION ");
 				}
@@ -267,29 +275,29 @@ public class EnvDashboardView extends View {
 	}
 	
 	private void formDataStructure(ResultSet resultSetObj) throws SQLException {
-		Deployment deploymentObj = getDeploymentResultSet(resultSetObj);
-		if(!deploymentData.getDeployments().containsKey(deploymentObj.getEnvName())) {
-			LinkedHashMap<String, ArrayList<Deployment>> compDeployments = new LinkedHashMap<>(); 
-			ArrayList<Deployment> deployment = new ArrayList<>();
+		Map<String, String> deploymentObj = getDeploymentResultSet(resultSetObj);
+		if(!deploymentData.getDeployments().containsKey(deploymentObj.get("envname"))) {
+			LinkedHashMap<String, ArrayList<Map<String, String>>> compDeployments = new LinkedHashMap<>(); 
+			ArrayList<Map<String, String>> deployment = new ArrayList<>();
 			deployment.add(deploymentObj);
-			compDeployments.put(deploymentObj.getCompName(), deployment);
-			deploymentData.getDeployments().put(deploymentObj.getEnvName(), compDeployments);
-		} else if(deploymentData.getDeployments().containsKey(deploymentObj.getEnvName()) && 
-				!deploymentData.getDeployments().get(deploymentObj.getEnvName()).containsKey(deploymentObj.getCompName())) {
-			ArrayList<Deployment> deployment = new ArrayList<>();
+			compDeployments.put(deploymentObj.get("compname"), deployment);
+			deploymentData.getDeployments().put(deploymentObj.get("envname"), compDeployments);
+		} else if(deploymentData.getDeployments().containsKey(deploymentObj.get("envname")) && 
+				!deploymentData.getDeployments().get(deploymentObj.get("envname")).containsKey(deploymentObj.get("compname"))) {
+			ArrayList<Map<String, String>> deployment = new ArrayList<>();
 			deployment.add(deploymentObj);
-			deploymentData.getDeployments().get(deploymentObj.getEnvName()).put(deploymentObj.getCompName(), deployment);
+			deploymentData.getDeployments().get(deploymentObj.get("envname")).put(deploymentObj.get("compname"), deployment);
 		} else {
-			deploymentData.getDeployments().get(deploymentObj.getEnvName()).get(deploymentObj.getCompName()).add(deploymentObj);
+			deploymentData.getDeployments().get(deploymentObj.get("envname")).get(deploymentObj.get("compname")).add(deploymentObj);
 		}
 		deploymentData.getAllDeploymentList().add(deploymentObj);
 	}
 
-	public Deployment getCompLastDeployed(String envName, String compName) {
+	public Map<String, String> getCompLastDeployed(String envName, String compName) {
 		try {
 			return deploymentData.getDeployments().get(envName).get(compName).get(0);
-		} catch(ArrayIndexOutOfBoundsException exp) {
-			return null;
+		} catch(Exception exp) {
+			return new HashMap<>();
 		}
 	}
 
@@ -299,7 +307,7 @@ public class EnvDashboardView extends View {
 	 * @param envName
 	 * @returns list of deployments
 	 */
-	public List<Deployment> getDeploymentsByCompEnv(String compName, String envName) {
+	public List<Map<String, String>> getDeploymentsByCompEnv(String compName, String envName) {
 		if(deploymentData.getDeployments().containsKey(envName) && 
 				deploymentData.getDeployments().get(envName).containsKey(compName)) {
 			return deploymentData.getDeployments().get(envName).get(compName);
@@ -313,32 +321,32 @@ public class EnvDashboardView extends View {
 	 * @param compName
 	 * @return list of deployments
 	 */
-	public List<Deployment> getDeploymentsByComp(String compName) {
-		ArrayList<Deployment> deployments = new ArrayList<>();
-		for(Deployment deployment : deploymentData.getAllDeploymentList()) {
-			if(deployment.getCompName().equalsIgnoreCase(compName)) {
+	public List<Map<String, String>> getDeploymentsByComp(String compName) {
+		ArrayList<Map<String, String>> deployments = new ArrayList<>();
+		for(Map<String, String> deployment : deploymentData.getAllDeploymentList()) {
+			if(deployment.get("compname").equalsIgnoreCase(compName)) {
 				deployments.add(deployment);
 			}
 		}
 		return deployments;
 	}
 	
-	public String getDeploymentObjValue(Deployment deploymentObj, String fieldName) {
-		try {
-			Field field = deploymentObj.getClass().getDeclaredField(fieldName);    
-			field.setAccessible(true);
-			return field.get(fieldName).toString();
-		} catch(Exception exp) {
+	public String getDeploymentObjValue(Map<String, String> dataObj, String fieldName) {
+		if(dataObj.containsKey(fieldName) && FIELDS.indexOf(fieldName) == -1) {
+			return dataObj.get(fieldName);
+		} else {
 			return null;
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	@Extension
 	public static final class DescriptorImpl extends ViewDescriptor {
 
 		private String envOrder;
 		private String compOrder;
 		private String deployHistory;
+		private static ArrayList<String> columns = new ArrayList<>();
 		
 		/**
 		 * descriptor impl constructor This empty constructor is required for
@@ -353,19 +361,30 @@ public class EnvDashboardView extends View {
 		 * @returns all the column names
 		 */
 		public static List<String> getCustomColumns() {
-			ArrayList<String> columns = new ArrayList<>();
-			Field[] fields = Deployment.class.getDeclaredFields();
-			for(Field field: fields) {
-				columns.add(field.getName());
+			if(columns.isEmpty()) {
+				String queryString = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='ENV_DASHBOARD';";
+				try {
+					Connection conn = DBConnection.getConnection();
+					Statement stat = conn.createStatement();
+					ResultSet rs = stat.executeQuery(queryString);
+					while (rs.next()) {
+						String col = rs.getString("COLUMN_NAME");
+						columns.add(col.toLowerCase());
+					}
+				} catch (SQLException e) {
+					System.out.println("E11" + e.getMessage());
+				} finally {
+					DBConnection.closeConnection();
+				}
 			}
 			return columns;
 		}
 
 		public ListBoxModel doFillColumnItems() {
 			ListBoxModel m = new ListBoxModel();
-			List<String> columns = getCustomColumns();
+			List<String> allColumns = getCustomColumns();
 			m.add("Select column to remove", "");
-			for (String column : columns) {
+			for (String column : allColumns) {
 				m.add(column, column);
 			}
 			return m;
@@ -381,7 +400,6 @@ public class EnvDashboardView extends View {
 			String queryString = "ALTER TABLE ENV_DASHBOARD DROP COLUMN " + column + ";";
 			// Get DB connection
 			conn = DBConnection.getConnection();
-
 			try {
 				assert conn != null;
 				stat = conn.createStatement();
