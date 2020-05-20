@@ -39,7 +39,7 @@
                                             <th style="text-align:center">Build</th>
                                             <j:set var="hasPackageColumn" value="${false}"/>
                                             <j:forEach items="${it.getDeployments(limitDeploy)}" var="deploymentObj">
-                                                <j:if test="${deploymentObj.get('packagename') != null &amp;&amp; !deploymentObj.get('packagename').equals('')}">
+                                                <j:if test="${compDeploymentObj.containsKey('packagename') &amp;&amp; deploymentObj.get('packagename') != null &amp;&amp; !deploymentObj.get('packagename').equals('')}">
                                                     <j:set var="hasPackageColumn" value="${true}"/>
                                                 </j:if>
                                             </j:forEach>
@@ -92,8 +92,8 @@
                                          <table class="table table-bordered table-striped table-condensed">
                                             <tbody>
                                                 <th style="width: 8%;text-align:center">Build</th>
-                                                <j:if test="${compDeploymentObj.get('packagename') != null &amp;&amp; !compDeploymentObj.get('packagename').equals('')}">
-                                                    <th style="text-align:center">Package</th>
+                                                <j:if test="${compDeploymentObj.containsKey('packagename') &amp;&amp; compDeploymentObj.get('packagename') != null &amp;&amp; !compDeploymentObj.get('packagename').equals('')}">
+                                                    <j:set var="hasPackageColumn" value="${true}"/>
                                                 </j:if>
                                                 <j:forEach items="${customColumnsList}" var="columnName">
                                                     <j:if test="${it.getDeploymentObjValue(compDeploymentObj,columnName) != null}">
@@ -108,7 +108,7 @@
                                                         <td>
                                                             <a title="View Deployment" href="${deployment.get('joburl')}">${deployment.get('buildnum')}</a>
                                                         </td>
-                                                        <j:if test="${deployment.get('packagename') != null &amp;&amp; !deployment.get('packagename').equals('')}">
+                                                        <j:if test="${deployment.containsKey('packagename') &amp;&amp; deployment.get('packagename') != null &amp;&amp; !deployment.get('packagename').equals('')}">
                                                             <td style="word-wrap:break-word">
                                                                 ${deployment.get('packagename')}
                                                             </td>

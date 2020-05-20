@@ -60,7 +60,7 @@ public class EnvDashboardView extends View {
 	    add("joburl");
 	    add("buildnum");
 	    add("created_at");
-	    add("packageName");
+	    add("packagename");
 	}};
 
 	@DataBoundConstructor
