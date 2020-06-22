@@ -99,6 +99,9 @@
                                                     <j:if test="${it.getDeploymentObjValue(compDeploymentObj,columnName) != null}">
                                                         <th style="text-align:center">${columnName.substring(0, 1).toUpperCase() + columnName.substring(1)}</th>
                                                     </j:if>
+                                                    <j:if test="${it.getDeploymentObjValue(compDeploymentObj,columnName) == null}">
+                                                    	<th style="text-align:center">--</th>
+                                                    </j:if>
                                                 </j:forEach>
                                                 <j:if test="${hasPackageColumn}">
                                                		<th style="text-align:center">Package</th>
@@ -111,11 +114,6 @@
                                                         <td>
                                                             <a title="View Deployment" href="${deployment.get('joburl')}">${deployment.get('buildnum')}</a>
                                                         </td>
-                                                        <j:if test="${deployment.get('packagename') != null &amp;&amp; !deployment.get('packagename').equals('')}">
-                                                            <td style="word-wrap:break-word">
-                                                                ${deployment.get('packagename')}
-                                                            </td>
-                                                        </j:if>
                                                         <j:forEach items="${customColumnsList}" var="columnName">
                                                             <j:if test="${it.getDeploymentObjValue(deployment,columnName) != null}">
                                                                 <td style="max-width:20em;word-wrap:break-word">
@@ -123,6 +121,11 @@
                                                                 </td>
                                                             </j:if>
                                                         </j:forEach>
+                                                        <j:if test="${deployment.get('packagename') != null &amp;&amp; !deployment.get('packagename').equals('')}">
+                                                            <td style="word-wrap:break-word">
+                                                                ${deployment.get('packagename')}
+                                                            </td>
+                                                        </j:if>
                                                         <td>
                                                             <j:switch on="${deployment.get('buildstatus')}">
                                                                 <j:case value="SUCCESS">
