@@ -99,9 +99,6 @@
                                                     <j:if test="${it.getDeploymentObjValue(compDeploymentObj,columnName) != null}">
                                                         <th style="text-align:center">${columnName.substring(0, 1).toUpperCase() + columnName.substring(1)}</th>
                                                     </j:if>
-                                                    <j:if test="${it.getDeploymentObjValue(compDeploymentObj,columnName) == null}">
-                                                    	<th style="text-align:center">--</th>
-                                                    </j:if>
                                                 </j:forEach>
                                                 <j:if test="${hasPackageColumn}">
                                                		<th style="text-align:center">Package</th>
