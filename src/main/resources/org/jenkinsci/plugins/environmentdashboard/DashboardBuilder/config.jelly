@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/environmentdashboard">
 
         <f:entry title="Environment name" field="nameOfEnv">
             <f:textbox />
@@ -20,11 +20,11 @@
         </f:entry>
 
         <f:nested>
-            <div>
+            <p:blockWrapper>
                 <f:optionalBlock field="addColumns" title="Add Custom Columns" inline="true">
                     <f:entry>
                         <f:repeatable field="data" var="item" minimum="${1}" items="${descriptor.data}">
-                            <div>
+                            <p:blockWrapper>
                                 <f:entry field="columnName" title="${%Column Name}">
                                     <f:textbox value="${item.columnName}" />
                                 </f:entry>
@@ -34,11 +34,11 @@
                                 <f:entry>
                                     <div align="right"> <f:repeatableDeleteButton /> </div>
                                 </f:entry>
-                            </div>
+                            </p:blockWrapper>
                         </f:repeatable>
                     </f:entry>
                 </f:optionalBlock>
-            </div>
+            </p:blockWrapper>
         </f:nested>
 
 </j:jelly>
