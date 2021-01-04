@@ -44,9 +44,6 @@ local.properties
 .buildpath
 
 #Linux
-
-.*
-!.gitignore
 *~
 
 # Windows image file caches
