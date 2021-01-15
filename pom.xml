@@ -10,7 +10,7 @@
 
   <groupId>io.jenkins.plugins</groupId>
   <artifactId>environment-dashboard</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>1.1.10</version>
   <packaging>hpi</packaging>
   <name>Environment Dashboard Plugin</name>
   <url>https://github.com/jenkinsci/environment-dashboard-plugin</url>
@@ -39,7 +39,7 @@
     <connection>scm:git:git@github.com:${gitHubRepo}.git</connection>
     <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
     <url>https://github.com/${gitHubRepo}</url>
-    <tag>${scmTag}</tag>
+    <tag>environment-dashboard-1.1.10</tag>
   </scm>
 
   <properties>
