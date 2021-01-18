@@ -4,16 +4,16 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.57</version>
+    <version>4.15</version>
     <relativePath />
   </parent>
 
   <groupId>io.jenkins.plugins</groupId>
   <artifactId>environment-dashboard</artifactId>
-  <version>1.1.9-SNAPSHOT</version>
+  <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
   <name>Environment Dashboard Plugin</name>
-  <url>https://plugins.jenkins.io/environment-dashboard</url>
+  <url>https://github.com/jenkinsci/environment-dashboard-plugin</url>
 
   <licenses>
     <license>
@@ -36,16 +36,18 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:jenkinsci/environment-dashboard-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/environment-dashboard-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/environment-dashboard-plugin</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:git@github.com:${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <url>https://github.com/${gitHubRepo}</url>
+    <tag>${scmTag}</tag>
   </scm>
 
   <properties>
+    <revision>1.1.11</revision>
+    <changelist>-SNAPSHOT</changelist>
+    <gitHubRepo>jenkinsci/environment-dashboard-plugin</gitHubRepo>
     <jenkins.version>2.223</jenkins.version>
     <java.level>8</java.level>
-    <slf4jVersion>1.7.26</slf4jVersion>
     <spotbugs.failOnError>false</spotbugs.failOnError>
   </properties>
 
@@ -58,6 +60,7 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
+        <!-- TODO once baseline is 2.249.x or greater then remove this version and pull from Jenkins core bom (versions must be in sync) -->
       <version>2.4.12</version>
     </dependency>
     <dependency>
@@ -71,26 +74,4 @@
       <version>1.12.4-1</version>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
-
-    <distributionManagement>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/releases</url>
-    </repository>
-  </distributionManagement>
-
 </project>
