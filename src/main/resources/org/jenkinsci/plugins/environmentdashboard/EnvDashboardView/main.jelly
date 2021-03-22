@@ -246,7 +246,7 @@
                                             <strong>
                                                 <j:if test="${deployment.get('packageName').equals('') || deployment.get('packageName') == null}">${deployment.get('buildNum')}</j:if>
                                                 <j:if test="${!deployment.get('packageName').equals('') &amp;&amp; deployment.get('packageName') != null}">${deployment.get('packageName')}</j:if>
-												<j:switch on="${deployment.get('buildstatus')}">
+                                                &#160;<j:switch on="${deployment.get('buildstatus')}">
 													<j:case value="SUCCESS">
                                                         <span title="SUCCESS" style="color:green;">&#10004;</span>
 													</j:case>
