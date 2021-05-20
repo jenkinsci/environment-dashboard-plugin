@@ -7,7 +7,10 @@
                 <td align="right"><a href="configure">Configure</a><st:nbsp/><st:nbsp/><st:nbsp/><a href="delete">Delete</a></td>
             </tr></table>
             <br /><br />
-            <st:include page="main.jelly"/>
+            <j:choose>
+   				<j:when test="${it.getViewOption().equals('vertical')}"><st:include page="main-vertical.jelly"/></j:when>
+				<j:otherwise><st:include page="main.jelly"/></j:otherwise>
+			</j:choose>
             <j:if test="${h.hasPermission(app.ADMINISTER)}">
                 <f:form name="purge" method="post" action="purgeSubmit" tableClass="advancedLink">
                     <f:advanced title="${%Dangerous Operation}">

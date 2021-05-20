@@ -47,14 +47,17 @@ public class EnvDashboardView extends View {
 	private String compOrder = null;
 
 	private String deployHistory = null;
+	
+	private String viewOption = null;
 
 	@DataBoundConstructor
 	public EnvDashboardView(final String name, final String envOrder, final String compOrder,
-			final String deployHistory) {
+			final String deployHistory, final String viewOption) {
 		super(name, Hudson.getInstance());
 		this.envOrder = envOrder;
 		this.compOrder = compOrder;
 		this.deployHistory = deployHistory;
+		this.viewOption = viewOption;
 	}
 
 	static {
@@ -113,12 +116,23 @@ public class EnvDashboardView extends View {
 		return Hudson.getInstance().doCreateItem(req, rsp);
 	}
 
+	/**
+		* Overridden for better type safety.
+		* If your plugin doesn't really define any property on Descriptor,
+		* you don't have to do this. 
+		*/
+	@Override
+	public DescriptorImpl getDescriptor() {
+		return (DescriptorImpl)super.getDescriptor();
+	}
+	
 	@Extension
 	public static final class DescriptorImpl extends ViewDescriptor {
 
 		private String envOrder;
 		private String compOrder;
 		private String deployHistory;
+		private String viewOption;
 
 		/**
 		 * descriptor impl constructor This empty constructor is required for
@@ -233,6 +247,7 @@ public class EnvDashboardView extends View {
 			envOrder = formData.getString("envOrder");
 			compOrder = formData.getString("compOrder");
 			deployHistory = formData.getString("deployHistory");
+			viewOption = formData.getString("viewOption");
 			save();
 			return super.configure(req, formData);
 		}
@@ -517,6 +532,14 @@ public class EnvDashboardView extends View {
 
 	public void setDeployHistory(final String deployHistory) {
 		this.deployHistory = deployHistory;
+	}
+
+	public String getViewOption() {
+		return viewOption;
+	}
+
+	public void setViewOption(final String viewOption) {
+		this.viewOption = viewOption;
 	}
 
 	@Override

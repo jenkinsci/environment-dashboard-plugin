@@ -12,6 +12,13 @@
     <f:entry title="Limit deploy history to last X deploys" field="deployHistory">
         <f:textbox default="10"/>
     </f:entry>
+    
+	<f:entry name="viewOption" title="View option" field="viewOption">
+	    <select name="viewOption">
+	        <option value="horizontal">Horizontal</option>
+	        <option selected="${it.getViewOption().equals('vertical') ? 'true' : null}" value="vertical">Vertical</option>	        
+	    </select>
+	</f:entry>	    
 
     <j:if test="${h.hasPermission(app.ADMINISTER)}">
         <f:advanced>
