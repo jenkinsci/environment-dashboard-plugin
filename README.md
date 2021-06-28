@@ -101,7 +101,7 @@ environmentDashboard(addColumns: false, buildJob: '', buildNumber: 'Version-1', 
     // some block
 }
 
-environmentDashboard(addColumns: true, buildJob: '', buildNumber: 'Version-1', componentName: 'WebApp-1', data: [[columnName: 'Col1', contents: 'Column 1 contents'], [columnName: 'Col1', contents: 'Column 2 contents']], nameOfEnv: 'Environment-1', packageName: '') {
+environmentDashboard(addColumns: true, buildJob: '', buildNumber: 'Version-1', componentName: 'WebApp-1', data: [[columnName: 'Col1', contents: 'Column 1 contents'], [columnName: 'Col2', contents: 'Column 2 contents']], nameOfEnv: 'Environment-1', packageName: '') {
     // some block
 }
 
