@@ -17,6 +17,16 @@
                     </f:advanced>
                 </f:form>
             </j:if>
+            <j:if test="${h.hasPermission(app.ADMINISTER)}">
+                <f:form name="deleteComponent" method="post" action="deleteComponent" tableClass="advancedLink">
+
+                    <f:advanced title="${%Delete Component Line}">
+                        <f:entry>
+                            <input type="submit" name="Submit" value="${%Delete Component}" class="submit-button danger" />
+                        </f:entry>
+                    </f:advanced>
+                </f:form>
+            </j:if>  
         </l:main-panel>
     </l:layout>
 </j:jelly>

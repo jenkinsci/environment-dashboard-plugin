@@ -47,14 +47,17 @@ public class EnvDashboardView extends View {
 	private String compOrder = null;
 
 	private String deployHistory = null;
+	
+	private String componentNameWillBeDeleted = null;
 
 	@DataBoundConstructor
 	public EnvDashboardView(final String name, final String envOrder, final String compOrder,
-			final String deployHistory) {
+			final String deployHistory, final String componentNameWillBeDeleted) {
 		super(name, Hudson.getInstance());
 		this.envOrder = envOrder;
 		this.compOrder = compOrder;
 		this.deployHistory = deployHistory;
+		this.componentNameWillBeDeleted = componentNameWillBeDeleted;
 	}
 
 	static {
@@ -108,6 +111,31 @@ public class EnvDashboardView extends View {
 		res.forwardToPreviousPage(req);
 	}
 
+	@RequirePOST
+	public void doDeleteComponent(final StaplerRequest req, StaplerResponse res)
+			throws IOException, ServletException, FormException {
+		checkPermission(Jenkins.ADMINISTER);
+		//System.out.println("[OKSY_log value of componentNameWillBeDeleted in doDeleteComponent method: ]" + componentNameWillBeDeleted);		
+		Connection conn = null;
+		Statement stat = null;
+		conn = DBConnection.getConnection();
+		String runQuery = null;
+		
+		try {
+			assert conn != null;
+			stat = conn.createStatement();
+			runQuery = "DELETE FROM env_dashboard where compName = '" + componentNameWillBeDeleted + "';";
+			stat.execute(runQuery);
+			System.out.println("[Delete query in doDeleteComponent method: ]" + runQuery);
+			System.out.println("Selected component has been removed successfully!.. " + componentNameWillBeDeleted);
+		} catch (SQLException e) {
+			System.out.println("E15: Could not delete component lines.\n" + e.getMessage());
+		} finally {
+			DBConnection.closeConnection();
+		}
+		res.forwardToPreviousPage(req);
+	}
+	
 	@Override
 	public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
 		return Hudson.getInstance().doCreateItem(req, rsp);
@@ -119,6 +147,7 @@ public class EnvDashboardView extends View {
 		private String envOrder;
 		private String compOrder;
 		private String deployHistory;
+		private String componentNameWillBeDeleted;
 
 		/**
 		 * descriptor impl constructor This empty constructor is required for
@@ -233,6 +262,7 @@ public class EnvDashboardView extends View {
 			envOrder = formData.getString("envOrder");
 			compOrder = formData.getString("compOrder");
 			deployHistory = formData.getString("deployHistory");
+			componentNameWillBeDeleted = formData.getString("componentNameWillBeDeleted");
 			save();
 			return super.configure(req, formData);
 		}
@@ -519,6 +549,14 @@ public class EnvDashboardView extends View {
 		this.deployHistory = deployHistory;
 	}
 
+	public String getcomponentNameWillBeDeleted() {
+		return componentNameWillBeDeleted;
+	}
+
+	public void setcomponentNameWillBeDeleted(final String componentNameWillBeDeleted) {
+		this.componentNameWillBeDeleted = componentNameWillBeDeleted;
+	}
+	
 	@Override
 	public boolean contains(TopLevelItem topLevelItem) {
 		return false;
