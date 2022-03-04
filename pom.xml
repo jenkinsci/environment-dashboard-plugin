@@ -32,7 +32,7 @@
   	<repository>
   		<id>maven.jenkins-ci.org</id>
   		<name>jenkinsci-releases</name>
-  		<url>https://repo.jenkins-ci.org/org/releases</url>
+  		<url>https://repo.jenkins-ci.org/releases</url>
   	</repository>
   </repositories>
   <properties>
