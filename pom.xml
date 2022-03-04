@@ -66,5 +66,12 @@
       <artifactId>jquery</artifactId>
       <version>1.12.4-1</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jenkins-ci.tools/maven-hpi-plugin -->
+    <dependency>
+      <groupId>org.jenkins-ci.tools</groupId>
+      <artifactId>maven-hpi-plugin</artifactId>
+      <version>3.17</version>
+    </dependency>
+
   </dependencies>
 </project>
