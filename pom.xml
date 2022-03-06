@@ -72,6 +72,12 @@
       <artifactId>maven-hpi-plugin</artifactId>
       <version>3.23</version>
     </dependency>
+<!-- https://mvnrepository.com/artifact/org.jenkins-ci/symbol-annotation -->
+<dependency>
+    <groupId>org.jenkins-ci</groupId>
+    <artifactId>symbol-annotation</artifactId>
+    <version>1.19</version>
+</dependency>
 
   </dependencies>
 </project>
