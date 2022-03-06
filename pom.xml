@@ -88,5 +88,29 @@
         <artifactId>stapler</artifactId>
         <version>1.140</version>
       </dependency>
-  </dependencies>
+  </dependencies>  
+  <plugin>        
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-enforcer-plugin</artifactId>
+      <version>3.0.0-M2</version>
+      <executions>
+          <execution>
+              <id>enforce-dependency-convergence</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <configuration>
+                  <rules>
+                      <requireUpperBoundDeps>
+                          <excludes>
+                              <exclude>org.kohsuke.stapler:stapler</exclude>
+                          </excludes>
+                      </requireUpperBoundDeps>
+                      <DependencyConvergence />
+                  </rules>
+              </configuration>
+          </execution>
+      </executions>
+  </plugin>
+  
 </project>
