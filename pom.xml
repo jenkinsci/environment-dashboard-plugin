@@ -81,7 +81,7 @@
       <dependency>
         <groupId>org.kohsuke.stapler</groupId>
         <artifactId>stapler-groovy</artifactId>
-        <version>${stapler.version}</version>
+        <version>1642.ve454c4518974</version>
       </dependency>
   </dependencies>
 </project>
