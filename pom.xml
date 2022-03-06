@@ -78,6 +78,10 @@
     <artifactId>symbol-annotation</artifactId>
     <version>1.19</version>
 </dependency>
-
+      <dependency>
+        <groupId>org.kohsuke.stapler</groupId>
+        <artifactId>stapler-groovy</artifactId>
+        <version>${stapler.version}</version>
+      </dependency>
   </dependencies>
 </project>
