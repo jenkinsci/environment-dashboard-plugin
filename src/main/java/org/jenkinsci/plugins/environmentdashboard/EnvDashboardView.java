@@ -128,7 +128,7 @@ public class EnvDashboardView extends View {
 			runQuery = "DELETE FROM env_dashboard where compName = ?;";
 			preStat = conn.prepareStatement(runQuery);
 			preStat.setString(1, componentNameWillBeDeleted);
-			int query = preStat.executeUpdate();
+			preStat.executeUpdate();
 
 			System.out.println("Selected component has been removed successfully!.. " + componentNameWillBeDeleted);
 
