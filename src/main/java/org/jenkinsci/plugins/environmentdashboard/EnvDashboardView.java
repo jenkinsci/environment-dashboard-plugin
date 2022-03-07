@@ -117,16 +117,12 @@ public class EnvDashboardView extends View {
 			throws IOException, ServletException, FormException {
 		checkPermission(Jenkins.ADMINISTER);
 		//System.out.println("[OKSY_log value of componentNameWillBeDeleted in doDeleteComponent method: ]" + componentNameWillBeDeleted);		
-		Connection conn = null;
-		//Statement stat = null;
-		PreparedStatement preStat = null;
-		conn = DBConnection.getConnection();
 		String runQuery = null;
+		runQuery = "DELETE FROM env_dashboard where compName = ?;";
 		
-		try {
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement preStat = conn.prepareStatement(runQuery);) {
 			assert conn != null;
-			runQuery = "DELETE FROM env_dashboard where compName = ?;";
-			preStat = conn.prepareStatement(runQuery);
 			preStat.setString(1, componentNameWillBeDeleted);
 			preStat.executeUpdate();
 
@@ -135,8 +131,6 @@ public class EnvDashboardView extends View {
 			
 		} catch (SQLException e) {
 			System.out.println("E15: Could not delete component lines.\n" + e.getMessage());
-		} finally {
-			DBConnection.closeConnection();
 		}
 		res.forwardToPreviousPage(req);
 	}
