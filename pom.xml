@@ -37,7 +37,7 @@
 		<revision>1.1.11</revision>
 		<changelist>-SNAPSHOT</changelist>
 		<gitHubRepo>jenkinsci/environment-dashboard-plugin</gitHubRepo>
-		<jenkins.version>2.330</jenkins.version>
+		<jenkins.version>2.223</jenkins.version>
 		<java.level>8</java.level>
 		<spotbugs.failOnError>false</spotbugs.failOnError>
 	</properties>
