@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 
 import javax.servlet.ServletException;
 
@@ -121,12 +122,18 @@ public class EnvDashboardView extends View {
 		runQuery = "DELETE FROM env_dashboard where compName = ?;";
 		
 		try (Connection conn = DBConnection.getConnection();
-				PreparedStatement preStat = conn.prepareStatement(runQuery);) {
-			assert conn != null;
-			preStat.setString(1, componentNameWillBeDeleted);
-			preStat.executeUpdate();
+				PreparedStatement preStat = Objects.nonNull(conn) ? conn.prepareStatement(runQuery) : null;) {
 
-			System.out.println("Selected component has been removed successfully!.. " + componentNameWillBeDeleted);
+			if (Objects.nonNull(preStat)) {
+				preStat.setString(1, componentNameWillBeDeleted);
+				preStat.executeUpdate();
+
+				System.out.println("Selected component has been removed successfully!.. " + componentNameWillBeDeleted);
+			}else{
+				System.err.println("Empty connection");
+			}
+			
+			
 
 			
 		} catch (SQLException e) {
