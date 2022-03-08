@@ -268,7 +268,7 @@ public class EnvDashboardView extends View {
 			envOrder = formData.getString("envOrder");
 			compOrder = formData.getString("compOrder");
 			deployHistory = formData.getString("deployHistory");
-			componentNameWillBeDeleted = formData.getString("componentNameWillBeDeleted");
+			//componentNameWillBeDeleted = formData.getString("componentNameWillBeDeleted");
 			save();
 			return super.configure(req, formData);
 		}
