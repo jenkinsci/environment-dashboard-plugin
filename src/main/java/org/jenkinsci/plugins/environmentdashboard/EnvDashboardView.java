@@ -153,7 +153,7 @@ public class EnvDashboardView extends View {
 		private String envOrder;
 		private String compOrder;
 		private String deployHistory;
-		private String componentNameWillBeDeleted;
+		//private String componentNameWillBeDeleted;
 
 		/**
 		 * descriptor impl constructor This empty constructor is required for
