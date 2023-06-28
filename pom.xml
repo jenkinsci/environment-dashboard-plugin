@@ -1,77 +1,65 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <parent>
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>4.15</version>
-    <relativePath />
-  </parent>
-
-  <groupId>io.jenkins.plugins</groupId>
-  <artifactId>environment-dashboard</artifactId>
-  <version>${revision}${changelist}</version>
-  <packaging>hpi</packaging>
-  <name>Environment Dashboard Plugin</name>
-  <url>https://github.com/jenkinsci/environment-dashboard-plugin</url>
-
-  <licenses>
-    <license>
-      <name>MIT License</name>
-      <url>https://opensource.org/licenses/MIT</url>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <id>vipinsthename</id>
-      <name>Vipin</name>
-      <email>vipinsthename@gmail.com</email>
-    </developer>
-    <developer>
-      <id>willwh</id>
-      <name>William Hetherington</name>
-      <email>will@willwh.com</email>
-    </developer>
-  </developers>
-
-  <scm>
-    <connection>scm:git:git@github.com:${gitHubRepo}.git</connection>
-    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
-    <url>https://github.com/${gitHubRepo}</url>
-    <tag>${scmTag}</tag>
-  </scm>
-
-  <properties>
-    <revision>1.1.11</revision>
-    <changelist>-SNAPSHOT</changelist>
-    <gitHubRepo>jenkinsci/environment-dashboard-plugin</gitHubRepo>
-    <jenkins.version>2.223</jenkins.version>
-    <java.level>8</java.level>
-    <spotbugs.failOnError>false</spotbugs.failOnError>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>job-dsl</artifactId>
-      <version>1.76</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-        <!-- TODO once baseline is 2.249.x or greater then remove this version and pull from Jenkins core bom (versions must be in sync) -->
-      <version>2.4.12</version>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.4.196</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>jquery</artifactId>
-      <version>1.12.4-1</version>
-    </dependency>
-  </dependencies>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>4.15</version>
+		<relativePath />
+	</parent>
+	<groupId>io.jenkins.plugins</groupId>
+	<artifactId>environment-dashboard</artifactId>
+	<version>${revision}${changelist}</version>
+	<packaging>hpi</packaging>
+	<name>Environment Dashboard Plugin</name>
+	<url>https://github.com/jenkinsci/environment-dashboard-plugin</url>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:${gitHubRepo}.git</connection>
+		<developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+		<url>https://github.com/${gitHubRepo}</url>
+		<tag>${scmTag}</tag>
+	</scm>
+	<repositories>
+		<repository>
+			<id>maven.jenkins-ci.org</id>
+			<name>jenkinsci-releases</name>
+			<url>https://repo.jenkins-ci.org/releases</url>
+		</repository>
+	</repositories>
+	<properties>
+		<revision>1.1.11</revision>
+		<changelist>-SNAPSHOT</changelist>
+		<gitHubRepo>jenkinsci/environment-dashboard-plugin</gitHubRepo>
+		<jenkins.version>2.223</jenkins.version>
+		<java.level>8</java.level>
+		<spotbugs.failOnError>false</spotbugs.failOnError>
+	</properties> 
+	<dependencies>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>job-dsl</artifactId>
+			<version>1.76</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<!-- TODO once baseline is 2.249.x or greater then remove this version and pull from Jenkins core bom (versions must be in sync) -->
+			<version>2.4.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.196</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>jquery</artifactId>
+			<version>1.12.4-1</version>
+		</dependency>
+	</dependencies>
 </project>

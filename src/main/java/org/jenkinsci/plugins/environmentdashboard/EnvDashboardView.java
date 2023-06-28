@@ -12,6 +12,7 @@ import hudson.util.ListBoxModel;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 
 import javax.servlet.ServletException;
 
@@ -47,14 +49,17 @@ public class EnvDashboardView extends View {
 	private String compOrder = null;
 
 	private String deployHistory = null;
+	
+	private String componentNameWillBeDeleted = null;
 
 	@DataBoundConstructor
 	public EnvDashboardView(final String name, final String envOrder, final String compOrder,
-			final String deployHistory) {
+			final String deployHistory, final String componentNameWillBeDeleted) {
 		super(name, Hudson.getInstance());
 		this.envOrder = envOrder;
 		this.compOrder = compOrder;
 		this.deployHistory = deployHistory;
+		this.componentNameWillBeDeleted = componentNameWillBeDeleted;
 	}
 
 	static {
@@ -108,6 +113,35 @@ public class EnvDashboardView extends View {
 		res.forwardToPreviousPage(req);
 	}
 
+	@RequirePOST
+	public void doDeleteComponent(final StaplerRequest req, StaplerResponse res)
+			throws IOException, ServletException, FormException {
+		checkPermission(Jenkins.ADMINISTER);
+		//System.out.println("[OKSY_log value of componentNameWillBeDeleted in doDeleteComponent method: ]" + componentNameWillBeDeleted);		
+		String runQuery = null;
+		runQuery = "DELETE FROM env_dashboard where compName = ?;";
+		
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement preStat = Objects.nonNull(conn) ? conn.prepareStatement(runQuery) : null;) {
+
+			if (Objects.nonNull(preStat)) {
+				preStat.setString(1, componentNameWillBeDeleted);
+				preStat.executeUpdate();
+
+				System.out.println("Selected component has been removed successfully!.. " + componentNameWillBeDeleted);
+			}else{
+				System.err.println("Empty connection");
+			}
+			
+			
+
+			
+		} catch (SQLException e) {
+			System.out.println("E15: Could not delete component lines.\n" + e.getMessage());
+		}
+		res.forwardToPreviousPage(req);
+	}
+	
 	@Override
 	public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
 		return Hudson.getInstance().doCreateItem(req, rsp);
@@ -119,6 +153,7 @@ public class EnvDashboardView extends View {
 		private String envOrder;
 		private String compOrder;
 		private String deployHistory;
+		//private String componentNameWillBeDeleted;
 
 		/**
 		 * descriptor impl constructor This empty constructor is required for
@@ -233,6 +268,7 @@ public class EnvDashboardView extends View {
 			envOrder = formData.getString("envOrder");
 			compOrder = formData.getString("compOrder");
 			deployHistory = formData.getString("deployHistory");
+			//componentNameWillBeDeleted = formData.getString("componentNameWillBeDeleted");
 			save();
 			return super.configure(req, formData);
 		}
@@ -519,6 +555,14 @@ public class EnvDashboardView extends View {
 		this.deployHistory = deployHistory;
 	}
 
+	public String getcomponentNameWillBeDeleted() {
+		return componentNameWillBeDeleted;
+	}
+
+	public void setcomponentNameWillBeDeleted(final String componentNameWillBeDeleted) {
+		this.componentNameWillBeDeleted = componentNameWillBeDeleted;
+	}
+	
 	@Override
 	public boolean contains(TopLevelItem topLevelItem) {
 		return false;

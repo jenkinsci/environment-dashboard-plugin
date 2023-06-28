@@ -13,6 +13,10 @@
         <f:textbox default="10"/>
     </f:entry>
 
+    <f:entry title="Component name which will be deleted" field="componentNameWillBeDeleted">
+        <f:textbox default="myeDefault"/>
+    </f:entry>
+
     <j:if test="${h.hasPermission(app.ADMINISTER)}">
         <f:advanced>
 
